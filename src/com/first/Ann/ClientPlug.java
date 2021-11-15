@@ -13,5 +13,6 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface ClientPlug {
+    //?
     String name();
 }
