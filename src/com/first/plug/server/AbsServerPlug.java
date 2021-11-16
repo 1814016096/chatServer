@@ -5,15 +5,13 @@ import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsPlug;
 import com.first.server.CoreServer;
 
-import java.io.Serializable;
-
 /**
  * @author 原初
  * @create 2021 - 11 - 08
  * @version 0.0.2 抽象的插件类，无论将来是什么插件，都得继承于这个插件
  */
 @ServerPlug(name = "AbsPlug")
-public abstract class AbsServerPlug<T> extends AbsPlug<T> implements Serializable {
+public abstract class AbsServerPlug<T> extends AbsPlug<T>{
     static final long serialVersionUID = 114514L;
     private AbsDataPack<T> gettedPack;//获取的数据包
     public AbsDataPack<T> getGettedPack() {

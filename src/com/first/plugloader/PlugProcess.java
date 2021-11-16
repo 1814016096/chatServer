@@ -1,7 +1,7 @@
 package com.first.plugloader;
 
 import com.first.datapack.AbsDataPack;
-import com.first.plug.server.AbsServerPlug;
+import com.first.plug.AbsPlug;
 import com.first.plug.AbsType;
 
 import java.io.IOException;
@@ -18,16 +18,16 @@ import java.util.jar.JarFile;
 /**
  * @author 原初
  * @create 2021 - 11 - 10
- * @version 0.0.2 插件的解析、处理、生成插件,生成单例
+ * @version 0.0.2 插件的解析、处理、生成插件,包含两个静态方法
  */
 public class PlugProcess {
-    public ArrayList<Class<? extends AbsServerPlug<?>>> judgeLegalPlug(AbsDataPack<?> datepack
-            , ArrayList<Class<? extends AbsServerPlug<?>>> plugs) {
-        ArrayList<Class<? extends AbsServerPlug<?>>> target = new ArrayList<>();
+    public ArrayList<Class<? extends AbsPlug<?>>> judgeLegalPlug(AbsDataPack<?> datepack
+            , ArrayList<Class<? extends AbsPlug<?>>> plugs) {
+        ArrayList<Class<? extends AbsPlug<?>>> target = new ArrayList<>();
         for (var plug : plugs) {
             if (!plug.getName().contains("Abs")) {
                 try {
-                    AbsServerPlug<?> serverPlug = plug.newInstance();
+                    AbsPlug<?> serverPlug = plug.newInstance();
                     Method typeMet = null;
                     Method startTo = null;
                     typeMet = plug.getMethod("getCtrlplugType");
@@ -65,10 +65,10 @@ public class PlugProcess {
 
 
 
-        public ArrayList<Class<? extends AbsServerPlug<?>>> getAllPathPlug(String jarPathName)
+        public ArrayList<Class<? extends AbsPlug<?>>> getAllPathPlug(String jarPathName, String AnnType)
     {
         String urlpath = "file:";
-        ArrayList<Class<? extends AbsServerPlug<?>>> targets = new ArrayList<>();
+        ArrayList<Class<? extends AbsPlug<?>>> targets = new ArrayList<>();
         URLClassLoader classLoader = null;
         Enumeration<JarEntry> jarEn = null;
         String jar = urlpath + jarPathName;
@@ -87,9 +87,9 @@ public class PlugProcess {
             String realName = jarEn.nextElement().getRealName();
             if(realName != null && realName.endsWith(".class"))
             {
-                Class<? extends AbsServerPlug<?>> undeteClass = null;
+                Class<? extends AbsPlug<?>> undeteClass = null;
                 try {
-                    undeteClass = (Class<? extends AbsServerPlug<?>>) classLoader.loadClass(realName.replace("/", ".")
+                    undeteClass = (Class<? extends AbsPlug<?>>) classLoader.loadClass(realName.replace("/", ".")
                             .replace(".class", ""));
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -97,7 +97,7 @@ public class PlugProcess {
 
                 Annotation[] annotations = undeteClass.getAnnotations();
                 for(Annotation temp : annotations) {
-                    if (temp.toString().contains("ServerPlug")) {
+                    if (temp.toString().contains(AnnType)) {
                         targets.add(undeteClass);
                     }
                 }
