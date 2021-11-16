@@ -49,5 +49,4 @@ abstract public class AbsDataPack<T> implements Serializable {
         DataType = dataType;
     }
     public abstract String toCoreServe();//想要给服务器一些什么内容
-    //还差整个用户和一点点工作
 }
