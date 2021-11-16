@@ -1,7 +1,7 @@
 package com.first.plugloader;
 
 import com.first.datapack.AbsDataPack;
-import com.first.plug.AbsServerPlug;
+import com.first.plug.server.AbsServerPlug;
 import com.first.plug.AbsType;
 
 import java.io.IOException;

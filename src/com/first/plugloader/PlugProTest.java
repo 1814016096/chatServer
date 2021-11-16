@@ -1,7 +1,7 @@
 package com.first.plugloader;
 
 import com.first.datapack.ChatDataPack;
-import com.first.plug.AbsServerPlug;
+import com.first.plug.server.AbsServerPlug;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;

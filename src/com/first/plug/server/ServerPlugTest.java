@@ -1,4 +1,4 @@
-package com.first.plug;
+package com.first.plug.server;
 
 import org.junit.jupiter.api.Test;
 

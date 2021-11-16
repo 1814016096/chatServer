@@ -1,6 +1,7 @@
-package com.first.plug;
+package com.first.plug.server;
 
 import com.first.Ann.ServerPlug;
+import com.first.plug.AbsType;
 
 /**
  * @author 原初
@@ -12,7 +13,7 @@ public class CoreChat extends NormalPlug{
     //服务器负责聊天内容的最本质的插件
     public CoreChat()
     {
-        setStatic("","聊天插件",AbsType.CHAT);
+        setSomting("","聊天插件", AbsType.CHAT);
     }
 
     @Override

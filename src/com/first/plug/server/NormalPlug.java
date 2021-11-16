@@ -1,7 +1,8 @@
-package com.first.plug;
+package com.first.plug.server;
 
 import com.first.Ann.ServerPlug;
 import com.first.datapack.AbsDataPack;
+import com.first.plug.AbsType;
 import com.first.server.CoreServer;
 
 /**
@@ -12,8 +13,8 @@ import com.first.server.CoreServer;
 @ServerPlug(name = "normal")
 public class NormalPlug extends AbsServerPlug<String>{
     public NormalPlug() {
-        setStatic("","这个插件啥都没做，如果你想的话，也可以继承这个插件"
-                ,AbsType.CORE);//自己写插件，在构造器中请先提供你插件的信息
+        setSomting("","这个插件啥都没做，如果你想的话，也可以继承这个插件"
+                , AbsType.CORE);//自己写插件，在构造器中请先提供你插件的信息
         setFlag("");
     }
     @Override
