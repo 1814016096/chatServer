@@ -1,10 +1,15 @@
 package com.first.client;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import com.first.datapack.AbsDataPack;
+import com.first.plug.AbsPlug;
+import com.first.plug.AbsType;
+import com.first.plug.client.AbsClientPlug;
+import com.first.plugloader.PlugProcess;
+
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * @author 原初
@@ -12,11 +17,81 @@ import java.net.Socket;
  * @version 0.0.1
  */
 public class Client {
+    ArrayList<Class<? extends AbsPlug<?>>> clientPlugs;
+    ArrayList<AbsClientPlug> tempPlug;
+    //还没测试
+    private Client(){
+        File plugDir = new File("clientplug");
+        clientPlugs = new ArrayList<>(50);
+        File[] plugs = plugDir.listFiles();
+        for(var plug : plugs)
+        {
+            if(plug.getName().endsWith(".jar"))
+            {
+                clientPlugs.addAll(PlugProcess.getAllPathPlug(plug.getAbsolutePath(),"ClientPlug"));
+            }
+        }
+        tempPlug = new ArrayList<>(50);
+        for(var plugClass : clientPlugs)
+        {
+            AbsClientPlug clientPlug = null;
+            try {
+                clientPlug = (AbsClientPlug) plugClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+            tempPlug.add(clientPlug);
+            clientPlug.whenInit(this);
+        }
+    }
+    private boolean thisIsColse = false;
     private Socket cntSot;
     private String name;
     private boolean isConnect;
     private String ip;
     private String whatCharSet = "gbk";
+    //close未测试
+    public void close() {
+        AbsDataPack<String> normal  = new AbsDataPack<>();
+        normal.setDataType(AbsType.END);
+        try {
+            cntSot.sendUrgentData(0xff);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        if(cntSot.isConnected())
+        {
+            OutputStream outputStream = null;
+            ObjectOutputStream out = null;
+            try {
+
+                outputStream = cntSot.getOutputStream();
+                out = new ObjectOutputStream(outputStream);
+                out.writeObject(normal);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                thisIsColse = true;
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (cntSot != null && !cntSot.isClosed()) {
+                    try {
+                        cntSot.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        System.exit(0);
+    }
     public void receive() {
         try {
             InputStreamReader inputStream =new InputStreamReader(cntSot.getInputStream(),whatCharSet);
@@ -48,6 +123,7 @@ public class Client {
     }
 
     public Client(String ip) {
+        this();
         try {
             this.cntSot = new Socket(InetAddress.getByName(ip),12221);
             isConnect = true;

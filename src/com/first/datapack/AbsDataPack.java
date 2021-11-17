@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * @version 0.0.2 数据包的抽象类
  */
 @DatePack(name = "AbsPack")//抽象的包，所有的数据包都要继承这个
-abstract public class AbsDataPack<T> implements Serializable {
+public class AbsDataPack<T> implements Serializable {
     static final long serialVersionUID = 19198L;
     private String startWith;
     public String getStartWith() {
@@ -48,5 +48,4 @@ abstract public class AbsDataPack<T> implements Serializable {
     public void setDataType(AbsType dataType) {
         DataType = dataType;
     }
-    public abstract String toCoreServe();//想要给服务器一些什么内容
 }

@@ -10,6 +10,7 @@ import java.io.Serializable;
 public abstract class AbsPlug <T> implements Serializable {
     static final long serialVersionUID = 1145L;//可序列化的序列号，自觉覆盖这个，
     // 不然我可不能保证传输的时候会发生什么
+    private boolean isAvai = true;//目前没用
     public T flag;//啥都没用，只是标识
     public void setFlag(T t)
     {

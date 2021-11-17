@@ -15,8 +15,4 @@ public class ChatDataPack extends AbsDataPack<String>{
         //test:
         setData("我超");
     }
-    @Override
-    public String toCoreServe() {
-        return null;
-    }
 }

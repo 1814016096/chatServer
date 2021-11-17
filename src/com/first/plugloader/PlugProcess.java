@@ -21,7 +21,7 @@ import java.util.jar.JarFile;
  * @version 0.0.2 插件的解析、处理、生成插件,包含两个静态方法
  */
 public class PlugProcess {
-    public ArrayList<Class<? extends AbsPlug<?>>> judgeLegalPlug(AbsDataPack<?> datepack
+    public static ArrayList<Class<? extends AbsPlug<?>>> judgeLegalPlug(AbsDataPack<?> datepack
             , ArrayList<Class<? extends AbsPlug<?>>> plugs) {
         ArrayList<Class<? extends AbsPlug<?>>> target = new ArrayList<>();
         for (var plug : plugs) {
@@ -65,7 +65,7 @@ public class PlugProcess {
 
 
 
-        public ArrayList<Class<? extends AbsPlug<?>>> getAllPathPlug(String jarPathName, String AnnType)
+        public static ArrayList<Class<? extends AbsPlug<?>>> getAllPathPlug(String jarPathName, String AnnType)
     {
         String urlpath = "file:";
         ArrayList<Class<? extends AbsPlug<?>>> targets = new ArrayList<>();

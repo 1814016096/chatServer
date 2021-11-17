@@ -13,6 +13,10 @@ import com.first.plug.AbsType;
  */
 @ClientPlug(name = "AbsPlug")
 public abstract class AbsClientPlug<R,T> extends AbsPlug<T> {
+    protected boolean isLocal;//要不要发送数据到服务器
+    public boolean isLocal() {
+        return isLocal;
+    }
     private AbsType initCtrlPackType;//开始时获取的数据包类型
     public AbsType getInitCtrlPackType() {
         return initCtrlPackType;
@@ -26,9 +30,12 @@ public abstract class AbsClientPlug<R,T> extends AbsPlug<T> {
     // 不一致)->插件解析数据包->数据包处理发送命令
     public AbsClientPlug() {
         setSomting("", "一个抽象的客户端插件类，所有的客户端插件都得继承这个", AbsType.CORE);
+        isLocal = true;
     }
+    abstract public void whenInit(Client thisCli);//初始化的时候做点啥（注意，所有插件初始化时都会执行）
     abstract public void ProcessPack(AbsDataPack<T> Datapack, Client thisCli);//在发送前处理数据包
     //在开始时只能根据startWith判断
-    abstract public void SendMessage(AbsDataPack<T> Datapack, Client thisCli);//发送信息
+    abstract public void sendMessage(AbsDataPack<T> Datapack, Client thisCli);//发送信息
+    abstract public void afterSend(AbsDataPack<T> Datapack, Client thisCli);//发送信息后要做啥
     abstract public void whenReceive(AbsDataPack<T> Datapack, Client thisCli);//接受到信息之后
 }
