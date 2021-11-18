@@ -7,9 +7,11 @@ import com.first.plug.client.AbsClientPlug;
 import com.first.plugloader.PlugProcess;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 原初
@@ -19,6 +21,12 @@ import java.util.ArrayList;
 public class Client {
     ArrayList<Class<? extends AbsPlug<?>>> clientPlugs;
     ArrayList<AbsClientPlug> tempPlug;
+    private boolean thisIsColse = false;
+    private Socket cntSot;
+    private String name;
+    private boolean isConnect;
+    private String ip;
+    private String whatCharSet = "gbk";
     //还没测试
     private Client(){
         File plugDir = new File("clientplug");
@@ -45,12 +53,6 @@ public class Client {
             clientPlug.whenInit(this);
         }
     }
-    private boolean thisIsColse = false;
-    private Socket cntSot;
-    private String name;
-    private boolean isConnect;
-    private String ip;
-    private String whatCharSet = "gbk";
     //close未测试
     public void close() {
         AbsDataPack<String> normal  = new AbsDataPack<>();
@@ -124,15 +126,31 @@ public class Client {
 
     public Client(String ip) {
         this();
-        try {
-            this.cntSot = new Socket(InetAddress.getByName(ip),12221);
-            isConnect = true;
-            this.ip = ip;
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("连接失败");
-            isConnect = false;
+//        try {
+//            this.cntSot = new Socket(InetAddress.getByName(ip),12221);
+//            isConnect = true;
+//            this.ip = ip;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            System.out.println("连接失败");
+//            isConnect = false;
+//        }
+    }
+    public List<String> split(String statement)
+    {
+        String[] temp = statement.split(" ");
+        List<String> collect = Arrays.stream(temp).filter(x -> !("".equals(x) || " ".equals(x))).collect(Collectors.toList());
+        return collect;
+
+    }
+    public String merge(List<String> fragrement)
+    {
+        StringBuffer temp = new StringBuffer(20);
+        for(var ele : fragrement)
+        {
+            temp.append(ele);
         }
+        return temp.toString();//ok
     }
     public void say(String str) {
         try

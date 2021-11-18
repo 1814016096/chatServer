@@ -98,7 +98,10 @@ public class PlugProcess {
                 Annotation[] annotations = undeteClass.getAnnotations();
                 for(Annotation temp : annotations) {
                     if (temp.toString().contains(AnnType)) {
-                        targets.add(undeteClass);
+                        if(!undeteClass.getName().contains("Abs"))
+                        {
+                            targets.add(undeteClass);
+                        }
                     }
                 }
             }

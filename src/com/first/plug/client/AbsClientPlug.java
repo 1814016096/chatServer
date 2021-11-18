@@ -13,6 +13,7 @@ import com.first.plug.AbsType;
  */
 @ClientPlug(name = "AbsPlug")
 public abstract class AbsClientPlug<R,T> extends AbsPlug<T> {
+    static final long serialVersionUID = 11451L;
     protected boolean isLocal;//要不要发送数据到服务器
     public boolean isLocal() {
         return isLocal;
