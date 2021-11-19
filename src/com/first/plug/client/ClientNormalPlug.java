@@ -7,17 +7,16 @@ import com.first.datapack.AbsDataPack;
 /**
  * @author 原初
  * @create 2021 - 11 - 18
+ * @version 0.0.2 默认插件，如果没有特别要求，请一律继承这个
  */
 @ClientPlug(name = "NormalPlug")
 public class ClientNormalPlug extends AbsClientPlug<String, String>{
     @Override
     public void whenInit(Client thisCli) {
-        System.out.println("欢迎使用!" + "\n这里是:" +this.getClass()
-                .getAnnotation(ClientPlug.class).name() + " 插件");
     }
 
     @Override
-    public void ProcessPack(AbsDataPack<String> Datapack, Client thisCli) {
+    public void processPack(AbsDataPack<String> Datapack, Client thisCli) {
 
     }
 
@@ -33,6 +32,11 @@ public class ClientNormalPlug extends AbsClientPlug<String, String>{
 
     @Override
     public void whenReceive(AbsDataPack<String> Datapack, Client thisCli) {
+
+    }
+
+    @Override
+    public void beforeClose(AbsDataPack<String> Datapack, Client thisCli) {
 
     }
 }

@@ -14,6 +14,10 @@ import com.first.plug.AbsType;
 @ClientPlug(name = "AbsPlug")
 public abstract class AbsClientPlug<R,T> extends AbsPlug<T> {
     static final long serialVersionUID = 11451L;
+    public String getPlugName()
+    {
+        return this.getClass().getAnnotation(ClientPlug.class).name();
+    }
     protected boolean isLocal;//要不要发送数据到服务器
     public boolean isLocal() {
         return isLocal;
@@ -34,9 +38,10 @@ public abstract class AbsClientPlug<R,T> extends AbsPlug<T> {
         isLocal = true;
     }
     abstract public void whenInit(Client thisCli);//初始化的时候做点啥（注意，所有插件初始化时都会执行）
-    abstract public void ProcessPack(AbsDataPack<T> Datapack, Client thisCli);//在发送前处理数据包
+    abstract public void processPack(AbsDataPack<T> Datapack, Client thisCli);//在发送前处理数据包
     //在开始时只能根据startWith判断
     abstract public void sendMessage(AbsDataPack<T> Datapack, Client thisCli);//发送信息
     abstract public void afterSend(AbsDataPack<T> Datapack, Client thisCli);//发送信息后要做啥
     abstract public void whenReceive(AbsDataPack<T> Datapack, Client thisCli);//接受到信息之后
+    abstract public void beforeClose(AbsDataPack<T> Datapack, Client thisCli);//在关闭客户端之前要做什么呢(接收到的是结束数据包)
 }

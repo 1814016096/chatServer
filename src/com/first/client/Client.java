@@ -27,6 +27,15 @@ public class Client {
     private boolean isConnect;
     private String ip;
     private String whatCharSet = "gbk";
+
+    public String getWhatCharSet() {
+        return whatCharSet;
+    }
+
+    public ArrayList<AbsClientPlug> getTempPlug() {
+        return tempPlug;
+    }
+
     //还没测试
     private Client(){
         File plugDir = new File("clientplug");
@@ -50,13 +59,26 @@ public class Client {
                 System.exit(-1);
             }
             tempPlug.add(clientPlug);
-            clientPlug.whenInit(this);
+        }
+        for(int i = 0; i < tempPlug.size(); i++)
+        {
+            var inst = tempPlug.get(i);
+            inst.whenInit(this);
+        }
+        if(tempPlug.size() != clientPlugs.size())
+        {
+            throw new RuntimeException("插件初始化出现错误!");
         }
     }
+
+    public void setTempPlug(ArrayList<AbsClientPlug> tempPlug) {
+        this.tempPlug = tempPlug;
+    }
+
     //close未测试
     public void close() {
         AbsDataPack<String> normal  = new AbsDataPack<>();
-        normal.setDataType(AbsType.END);
+        normal.setDataType(AbsType.CLOSE);
         try {
             cntSot.sendUrgentData(0xff);
         } catch (IOException e) {
@@ -65,6 +87,10 @@ public class Client {
         }
         if(cntSot.isConnected())
         {
+            for(var inst : tempPlug)
+            {
+                inst.beforeClose(normal, this);
+            }
             OutputStream outputStream = null;
             ObjectOutputStream out = null;
             try {
