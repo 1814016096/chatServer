@@ -17,6 +17,7 @@ public class GetPlugListPlug extends ClientNormalPlug{
     public GetPlugListPlug()
     {
         setSomting("/plug","一个获取插件列表的插件", AbsType.COMMAND);
+        setInitCtrlPackType(AbsType.COMMAND);
         isLocal = true;
     }
 

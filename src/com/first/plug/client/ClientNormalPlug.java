@@ -3,6 +3,7 @@ package com.first.plug.client;
 import com.first.Ann.ClientPlug;
 import com.first.client.Client;
 import com.first.datapack.AbsDataPack;
+import com.first.plug.AbsType;
 
 /**
  * @author 原初
@@ -11,6 +12,11 @@ import com.first.datapack.AbsDataPack;
  */
 @ClientPlug(name = "NormalPlug")
 public class ClientNormalPlug extends AbsClientPlug<String, String>{
+    {
+        initFlag = "un";
+        setSomting("", "一个默认插件", AbsType.CHAT);
+        setInitCtrlPackType(AbsType.CHAT);
+    }
     @Override
     public void whenInit(Client thisCli) {
     }

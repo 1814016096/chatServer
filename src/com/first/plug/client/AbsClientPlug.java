@@ -29,7 +29,7 @@ public abstract class AbsClientPlug<R,T> extends AbsPlug<T> {
     public void setInitCtrlPackType(AbsType initCtrlPackType) {
         this.initCtrlPackType = initCtrlPackType;
     }
-    private R initFlag;//开始时处理的数据包
+    public R initFlag;//开始时处理的数据包
     //流程 : 初始化->解析命令、获取相应的插件->根据插件生成相对应的数据包->处理数据包->发送数据包
     //接受数据包->根据数据包类型和startWith获取相应的插件(为啥开始和结束不一致，因为发送和接受到的数据包类型可能
     // 不一致)->插件解析数据包->数据包处理发送命令

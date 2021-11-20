@@ -35,8 +35,4 @@ public abstract class AbsPlug <T> implements Serializable {
     public AbsType getCtrlplugType() {
         return ctrlplugType;
     }
-    private String ctrlstartWith;//你控制的语句以什么开始呢?
-    public String getCltrName() {
-        return ctrlstartWith;
-    }
 }

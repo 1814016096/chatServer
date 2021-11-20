@@ -77,48 +77,55 @@ public class Client {
 
     //close未测试
     public void close() {
-        AbsDataPack<String> normal  = new AbsDataPack<>();
-        normal.setDataType(AbsType.CLOSE);
-        try {
-            cntSot.sendUrgentData(0xff);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-        if(cntSot.isConnected())
+        if(cntSot != null && cntSot.isConnected())
         {
-            for(var inst : tempPlug)
-            {
-                inst.beforeClose(normal, this);
-            }
-            OutputStream outputStream = null;
-            ObjectOutputStream out = null;
+            AbsDataPack<String> normal  = new AbsDataPack<>();
+            normal.setDataType(AbsType.CLOSE);
             try {
-
-                outputStream = cntSot.getOutputStream();
-                out = new ObjectOutputStream(outputStream);
-                out.writeObject(normal);
+                cntSot.sendUrgentData(0xff);
             } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
-                thisIsColse = true;
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                System.exit(-1);
+            }
+            if(cntSot.isConnected())
+            {
+                for(var inst : tempPlug)
+                {
+                    inst.beforeClose(normal, this);
                 }
-                if (cntSot != null && !cntSot.isClosed()) {
-                    try {
-                        cntSot.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                OutputStream outputStream = null;
+                ObjectOutputStream out = null;
+                try {
+
+                    outputStream = cntSot.getOutputStream();
+                    out = new ObjectOutputStream(outputStream);
+                    out.writeObject(normal);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }finally {
+                    thisIsColse = true;
+                    if (out != null) {
+                        try {
+                            out.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (cntSot != null && !cntSot.isClosed()) {
+                        try {
+                            cntSot.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
+            System.exit(0);
         }
-        System.exit(0);
+        else
+        {
+            System.exit(0);
+        }
     }
     public void receive() {
         try {
@@ -161,6 +168,89 @@ public class Client {
 //            System.out.println("连接失败");
 //            isConnect = false;
 //        }
+    }
+    public ArrayList<AbsClientPlug<?,?>> matchPlug(String startWith)
+    {
+        AbsType absType = AnylizeType(startWith);
+        ArrayList<AbsClientPlug<?,?>> plugArrs = new ArrayList<>(5);
+        String realStartWith = "";
+        if(absType == AbsType.CHAT);
+        else
+        {
+            realStartWith = startWith;
+        }
+        for(AbsClientPlug plug : tempPlug)
+        {
+            if(realStartWith.equals(plug.getCtrlName()))
+            {
+                if(plug.getInitCtrlPackType() != absType)
+                {
+                    throw new RuntimeException("插件错误! 插件名为:" + plug.getPlugName());
+                }
+                plugArrs.add(plug);
+            }
+        }
+        if(plugArrs.size() == 0)
+        {
+            plugArrs = matchPlug("chat");
+        }
+        else if(plugArrs.size() > 1)
+        {
+            AbsClientPlug front = plugArrs.get(0);
+            for(AbsClientPlug plug : plugArrs)
+            {
+                if(plug.initFlag.getClass().getName().equals(
+                        front.initFlag.getClass().getName()))
+                {
+                    front = plug;
+                }
+                else
+                {
+                    throw new RuntimeException("插件冲突! 具体为 : " + plug.getPlugName() + " 和 "
+                            + front.getPlugName());
+                }
+            }
+        }
+        else;
+        return plugArrs;
+    }
+    public String getStartWith(String startWith)
+    {
+        AbsType absType = AnylizeType(startWith);
+        if(absType == AbsType.CHAT)
+        {
+            return "";
+        }
+        else if(absType == AbsType.COMMAND)
+        {
+            return "/";
+        }
+        else
+        {
+            return startWith.substring(0,1);
+        }
+    }
+    public AbsType AnylizeType(String startWith)
+    {
+        if(startWith.length() == 0)
+        {
+            startWith = "chat";
+        }
+        String mark = startWith.substring(0,1);
+        String[] includeArr = new String[]{"!","@","#", "$", "%", "%", "*"};
+        List<String> includes = Arrays.asList(includeArr);
+        if("/".equals(mark))
+        {
+            return AbsType.COMMAND;
+        }
+        else if(includes.contains(mark))
+        {
+            return AbsType.PLUG;
+        }
+        else
+        {
+            return AbsType.CHAT;
+        }
     }
     public List<String> split(String statement)
     {

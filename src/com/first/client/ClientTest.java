@@ -1,9 +1,6 @@
 package com.first.client;
 
-import com.first.plug.client.AbsClientPlug;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
 
 /**
  * @author 原初
@@ -14,12 +11,8 @@ public class ClientTest {
     public void temptest()
     {
         Client client = new Client("1.1.1.1");
-        ArrayList<AbsClientPlug> tempPlug = client.getTempPlug();
-        System.out.println("==================");
-        for(var i : tempPlug)
-        {
-            System.out.println(i.getPlugName());
-        }
-
+        //System.out.println(client.AnylizeType("woc!"));
+        //System.out.println(client.matchPlug("/plug"));
+        System.out.println(client.matchPlug(""));
     }
 }
