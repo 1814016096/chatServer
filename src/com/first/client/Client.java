@@ -7,6 +7,7 @@ import com.first.plug.client.AbsClientPlug;
 import com.first.plugloader.PlugProcess;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,15 +20,16 @@ import java.util.stream.Collectors;
  * @version 0.0.1
  */
 public class Client {
+    public String tempStatement;
     ArrayList<Class<? extends AbsPlug<?>>> clientPlugs;
     ArrayList<AbsClientPlug> tempPlug;
     private boolean thisIsColse = false;
     private Socket cntSot;
-    private String name;
+    private String name = null;
     private boolean isConnect;
     private String ip;
     private String whatCharSet = "gbk";
-
+    ObjectOutputStream objout = null;
     public String getWhatCharSet() {
         return whatCharSet;
     }
@@ -38,7 +40,8 @@ public class Client {
 
     //还没测试
     private Client(){
-        File plugDir = new File("clientplug");
+        File plugDir = new File(System.getProperty("user.dir") + "/chatServe" +"/clientPlug");
+        System.out.println(plugDir.getAbsolutePath());
         clientPlugs = new ArrayList<>(50);
         File[] plugs = plugDir.listFiles();
         for(var plug : plugs)
@@ -159,19 +162,26 @@ public class Client {
 
     public Client(String ip) {
         this();
-//        try {
-//            this.cntSot = new Socket(InetAddress.getByName(ip),12221);
-//            isConnect = true;
-//            this.ip = ip;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            System.out.println("连接失败");
-//            isConnect = false;
-//        }
+        if(ip != "1.1.1.1")
+        try {
+            this.cntSot = new Socket(InetAddress.getByName(ip),12221);
+            OutputStream out = cntSot.getOutputStream();
+            objout = new ObjectOutputStream(out);
+            AbsDataPack<Object> startPack = new AbsDataPack<>();
+            startPack.setDataType(AbsType.START);
+            objout.writeObject(startPack);
+            isConnect = true;
+            this.ip = ip;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("连接失败");
+            isConnect = false;
+            System.exit(0);
+        }
     }
     public ArrayList<AbsClientPlug<?,?>> matchPlug(String startWith)
     {
-        AbsType absType = AnylizeType(startWith);
+        AbsType absType = anylizeType(startWith);
         ArrayList<AbsClientPlug<?,?>> plugArrs = new ArrayList<>(5);
         String realStartWith = "";
         if(absType == AbsType.CHAT);
@@ -216,7 +226,7 @@ public class Client {
     }
     public String getStartWith(String startWith)
     {
-        AbsType absType = AnylizeType(startWith);
+        AbsType absType = anylizeType(startWith);
         if(absType == AbsType.CHAT)
         {
             return "";
@@ -230,7 +240,7 @@ public class Client {
             return startWith.substring(0,1);
         }
     }
-    public AbsType AnylizeType(String startWith)
+    public AbsType anylizeType(String startWith)
     {
         if(startWith.length() == 0)
         {
@@ -269,12 +279,26 @@ public class Client {
         return temp.toString();//ok
     }
     public void say(String str) {
+        String start = getStartWith(str);
+        tempStatement = str;
+        ArrayList<AbsClientPlug<?, ?>> enablePlugList = matchPlug(start);
+        AbsDataPack absDataPack = new AbsDataPack();
+        absDataPack.setDataType(anylizeType(start));
+        absDataPack.setClientname(name);
+        absDataPack.setStartWith(start);
         try
         {
-            OutputStream outputStream = cntSot.getOutputStream();
-            outputStream.write(("<"  + name + ">:"  + str).getBytes(whatCharSet));
-            outputStream.write((byte)127);
-            System.out.println("<"  + name  + ">:" + str);
+            if(objout == null)
+            {
+                throw new RuntimeException("连接错误");
+            }
+            for(int i = 0; i < enablePlugList.size(); i++)
+            {
+                AbsClientPlug plug = enablePlugList.get(i);
+                plug.processPack(absDataPack, this);
+            }
+            objout.writeObject(absDataPack);
+            tempStatement = null;
         } catch (IOException e) {
             try {
                 cntSot.sendUrgentData(0xff);
@@ -284,9 +308,9 @@ public class Client {
                     cntSot = new Socket(ip,12221);
                     if(cntSot.isConnected())
                     {
+                        objout.close();
+                        objout = new ObjectOutputStream(cntSot.getOutputStream());
                         System.out.println("连接成功");
-                        cntSot.getOutputStream().write(name.getBytes(whatCharSet));
-                        cntSot.getOutputStream().write(127);
                     }
                 } catch (IOException exception) {
                     System.out.println("连接失败，服务器真的崩了");
