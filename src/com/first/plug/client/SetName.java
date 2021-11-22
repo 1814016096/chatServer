@@ -24,7 +24,14 @@ public class SetName extends ClientNormalPlug{
         SetName.setPrintType = setPrintType;
         SetName.setInputType = setInputType;
     }
-
+    public static void setPrintWay(Consumer<String> setPrintType)
+    {
+        SetName.setPrintType = setPrintType;
+    }
+    public static void setInputWay(Supplier<String> setInputType)
+    {
+        SetName.setInputType = setInputType;
+    }
     @Override
     public void whenInit(Client thisCli) {
         if(thisCli.getName() == null)

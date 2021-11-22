@@ -4,7 +4,10 @@ import com.first.Ann.DatePack;
 import com.first.plug.AbsType;
 import com.first.server.CoreServer;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
@@ -16,6 +19,13 @@ import java.util.ArrayList;
 public class AbsDataPack<T> implements Serializable {
     static final long serialVersionUID = 19198L;
     private String startWith;
+    private static String charSet = "gbk";
+    public static String getCharSet() {
+        return charSet;
+    }
+    public static void setCharSet(String charSet) {
+        charSet = charSet;
+    }
     public String getStartWith() {
         return startWith;
     }
@@ -40,6 +50,13 @@ public class AbsDataPack<T> implements Serializable {
     public T getInnerData()
     {
         return this.innerData;
+    }
+    public InputStream getInnerDataByInputStream() throws UnsupportedEncodingException {
+        return new ByteArrayInputStream(this.innerData.toString().getBytes(charSet));
+    }
+    public String getInnerDataBystring()
+    {
+        return this.innerData.toString();
     }
     private AbsType DataType = AbsType.CORE;
     public AbsType getDataType() {

@@ -16,6 +16,7 @@ public class ClientNormalPlug extends AbsClientPlug<String, String>{
         initFlag = "un";
         setSomting("", "一个默认插件", AbsType.CHAT);
         setInitCtrlPackType(AbsType.CHAT);
+        isLocal = true;
     }
     @Override
     public void whenInit(Client thisCli) {

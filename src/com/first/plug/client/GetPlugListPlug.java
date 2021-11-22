@@ -6,6 +6,7 @@ import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /**
  * @author 原初
@@ -14,6 +15,11 @@ import java.util.ArrayList;
  */
 @ClientPlug(name = "getPlugs")
 public class GetPlugListPlug extends ClientNormalPlug{
+    private static Consumer<String> printWay = x -> System.out.println(x);
+    public static void setPrintWay(Consumer<String> printWay)
+    {
+        GetPlugListPlug.printWay = printWay;
+    }
     public GetPlugListPlug()
     {
         setSomting("/plug","一个获取插件列表的插件", AbsType.COMMAND);
@@ -29,10 +35,10 @@ public class GetPlugListPlug extends ClientNormalPlug{
     @Override
     public void whenInit(Client thisCli) {
         ArrayList<AbsClientPlug> tempPlugs = thisCli.getTempPlug();
-        System.out.println("正在使用:");
+        printWay.accept("正在使用的插件:");
         for(var plug : tempPlugs)
         {
-            System.out.println(plug.getPlugName());
+            printWay.accept(plug.getPlugName() + " : " + plug.getDescription());
         }
     }
 }

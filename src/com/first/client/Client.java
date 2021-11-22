@@ -7,11 +7,15 @@ import com.first.plug.client.AbsClientPlug;
 import com.first.plugloader.PlugProcess;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +33,13 @@ public class Client {
     private boolean isConnect;
     private String ip;
     private String whatCharSet = "gbk";
+    private Consumer<AbsDataPack> ClientprintWay = x -> System.out.println(x.getInnerDataBystring());
+    private Consumer<String> allPrintWay = System.out::println;
+    private Supplier<String> allInputWay = () ->{
+        Scanner scan = new Scanner(System.in);
+        return scan.nextLine();
+    };
+
     ObjectOutputStream objout = null;
     public String getWhatCharSet() {
         return whatCharSet;
@@ -38,8 +49,8 @@ public class Client {
         return tempPlug;
     }
 
-    //还没测试
     private Client(){
+        AbsDataPack.setCharSet(whatCharSet);
         File plugDir = new File(System.getProperty("user.dir") + "/chatServe" +"/clientPlug");
         System.out.println(plugDir.getAbsolutePath());
         clientPlugs = new ArrayList<>(50);
@@ -56,6 +67,20 @@ public class Client {
         {
             AbsClientPlug clientPlug = null;
             try {
+                Method met = plugClass.getMethod("setPrintWay", Consumer.class);
+                met.invoke(null, allPrintWay);
+                allPrintWay.accept(plugClass.getName() + " : " + "printable");
+            } catch (Exception e) {
+            }
+            try {
+                Method met = plugClass.getMethod("setInputWay", Supplier.class);
+                met.invoke(null, allInputWay);
+                allPrintWay.accept(plugClass.getName() + " : " + "inputable");
+            } catch (Exception e) {
+            }
+
+            try {
+
                 clientPlug = (AbsClientPlug) plugClass.getConstructor().newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -73,7 +98,11 @@ public class Client {
             throw new RuntimeException("插件初始化出现错误!");
         }
     }
-
+    public Client(String ip, Consumer<AbsDataPack> printWay)
+    {
+        this(ip);
+        this.ClientprintWay = printWay;
+    }
     public void setTempPlug(ArrayList<AbsClientPlug> tempPlug) {
         this.tempPlug = tempPlug;
     }
@@ -281,39 +310,55 @@ public class Client {
     public void say(String str) {
         String start = getStartWith(str);
         tempStatement = str;
-        ArrayList<AbsClientPlug<?, ?>> enablePlugList = matchPlug(start);
+        ArrayList<AbsClientPlug<?, ?>> enablePlugList = matchPlug(split(str).get(0));
         AbsDataPack absDataPack = new AbsDataPack();
         absDataPack.setDataType(anylizeType(start));
         absDataPack.setClientname(name);
         absDataPack.setStartWith(start);
+        allPrintWay.accept(name + ":" + str);
         try
         {
-            if(objout == null)
+            int localNum = 0;
+            boolean isAllInLocal = false;
+            /*if(objout == null)
             {
                 throw new RuntimeException("连接错误");
-            }
-            for(int i = 0; i < enablePlugList.size(); i++)
+            }*/
+            int i = 0;
+            for(i = 0; i < enablePlugList.size(); i++)
             {
                 AbsClientPlug plug = enablePlugList.get(i);
-                plug.processPack(absDataPack, this);
+                if(plug.isLocal())
+                {
+                    localNum++;
+                    plug.processPack(null, this);
+                }
+                else
+                {
+                    plug.processPack(absDataPack, this);
+                }
             }
-            objout.writeObject(absDataPack);
+            isAllInLocal = (i == localNum);
+            if(!isAllInLocal)
+            {
+                objout.writeObject(absDataPack);
+            }
             tempStatement = null;
         } catch (IOException e) {
             try {
                 cntSot.sendUrgentData(0xff);
             } catch (IOException ioException) {
-                System.out.println("服务端崩了，程序尝试重连");
+                allPrintWay.accept("服务端崩了，程序尝试重连");
                 try {
                     cntSot = new Socket(ip,12221);
                     if(cntSot.isConnected())
                     {
                         objout.close();
                         objout = new ObjectOutputStream(cntSot.getOutputStream());
-                        System.out.println("连接成功");
+                        allPrintWay.accept("连接成功");
                     }
                 } catch (IOException exception) {
-                    System.out.println("连接失败，服务器真的崩了");
+                    System.err.println("连接失败，服务器真的崩了");
                     System.exit(-11);
                 }
             }

@@ -14,6 +14,7 @@ public class ChatCore extends ClientNormalPlug{
     public ChatCore()
     {
         setSomting("", "核心的聊天插件，请置于最上层", AbsType.CHAT);
+        isLocal = false;
     }
     @Override
     public void processPack(AbsDataPack<String> Datapack, Client thisCli) {

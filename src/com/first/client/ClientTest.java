@@ -14,7 +14,7 @@ public class ClientTest {
         Client client = new Client("1.1.1.1");
         Scanner scan = new Scanner(System.in);
         SetName.setType(System.out::println, () -> scan.next());
-        client.say("woc");
+        client.say("/plug");
     }
     @Test
     public void temptest()
