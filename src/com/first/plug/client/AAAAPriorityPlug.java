@@ -13,8 +13,8 @@ import java.util.ArrayList;
  * @version 0.0.2 为插件排序
  */
 @ClientPlug(name = "priorityPlug")
-public class PriorityPlug extends ClientNormalPlug {
-    public PriorityPlug()
+public class AAAAPriorityPlug extends ClientNormalPlug {
+    public AAAAPriorityPlug()
     {
         setSomting("null", "一个为插件排序的插件", AbsType.CORE);
         isLocal = true;
@@ -42,7 +42,7 @@ public class PriorityPlug extends ClientNormalPlug {
         {
             ArrayList<AbsClientPlug> temp = new ArrayList<>(tempPlugs.size());
             try(InputStreamReader input =
-                        new InputStreamReader(new FileInputStream(props));
+                        new InputStreamReader(new FileInputStream(props))
             )
             {
                 BufferedReader bufferIn = new BufferedReader(input);
@@ -59,6 +59,8 @@ public class PriorityPlug extends ClientNormalPlug {
                         }
                     }
                 }
+                if(!"priorityPlug".equals(temp.get(0).getPlugName()))
+                    temp.get(0).whenInit(thisCli);
             } catch (IOException e) {
                 e.printStackTrace();
             }

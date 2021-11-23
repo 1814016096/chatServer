@@ -5,12 +5,19 @@ import com.first.client.Client;
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
 
+import java.util.function.Consumer;
+
 /**
  * @author 原初
  * @create 2021 - 11 - 21
  */
 @ClientPlug(name = "CoreChat")
 public class ChatCore extends ClientNormalPlug{
+    private static Consumer<String> printWay = x -> System.out.println(x);
+    public static void setPrintWay(Consumer<String> printWay)
+    {
+        ChatCore.printWay = printWay;
+    }
     public ChatCore()
     {
         setSomting("", "核心的聊天插件，请置于最上层", AbsType.CHAT);
@@ -19,5 +26,9 @@ public class ChatCore extends ClientNormalPlug{
     @Override
     public void processPack(AbsDataPack<String> Datapack, Client thisCli) {
         Datapack.setData("<" + thisCli.getName() + ">" + thisCli.tempStatement);
+    }
+    @Override
+    public Consumer<AbsDataPack> whenReceive(AbsDataPack<String> Datapack, Client thisCli) {
+        return null;
     }
 }

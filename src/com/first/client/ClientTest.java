@@ -1,6 +1,5 @@
 package com.first.client;
 
-import com.first.plug.client.SetName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Scanner;
@@ -11,15 +10,15 @@ import java.util.Scanner;
  */
 public class ClientTest {
     public static void main(String[] args) {
-        Client client = new Client("1.1.1.1");
         Scanner scan = new Scanner(System.in);
-        SetName.setType(System.out::println, () -> scan.next());
+        Client client = new Client("1.1.1.1", System.out::println, scan::nextLine);
+        //SetName.setType(System.out::println, () -> scan.next());
         client.say("/plug");
     }
     @Test
     public void temptest()
     {
-        Client client = new Client("1.1.1.1");
+        //Client client = new Client("1.1.1.1");
         //System.out.println(client.AnylizeType("woc!"));
         //System.out.println(client.matchPlug("/plug"));
     }

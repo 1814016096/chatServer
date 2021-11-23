@@ -33,7 +33,6 @@ public class Client {
     private boolean isConnect;
     private String ip;
     private String whatCharSet = "gbk";
-    private Consumer<AbsDataPack> ClientprintWay = x -> System.out.println(x.getInnerDataBystring());
     private Consumer<String> allPrintWay = System.out::println;
     private Supplier<String> allInputWay = () ->{
         Scanner scan = new Scanner(System.in);
@@ -49,10 +48,18 @@ public class Client {
         return tempPlug;
     }
 
-    private Client(){
+    private Client(Consumer<String> printWay, Supplier<String> inputWay){
+        if(printWay != null)
+        {
+            this.allPrintWay = printWay;
+        }
+        if(inputWay != null)
+        {
+            this.allInputWay = inputWay;
+        }
         AbsDataPack.setCharSet(whatCharSet);
         File plugDir = new File(System.getProperty("user.dir") + "/chatServe" +"/clientPlug");
-        System.out.println(plugDir.getAbsolutePath());
+        //System.out.println(plugDir.getAbsolutePath());
         clientPlugs = new ArrayList<>(50);
         File[] plugs = plugDir.listFiles();
         for(var plug : plugs)
@@ -98,11 +105,7 @@ public class Client {
             throw new RuntimeException("插件初始化出现错误!");
         }
     }
-    public Client(String ip, Consumer<AbsDataPack> printWay)
-    {
-        this(ip);
-        this.ClientprintWay = printWay;
-    }
+
     public void setTempPlug(ArrayList<AbsClientPlug> tempPlug) {
         this.tempPlug = tempPlug;
     }
@@ -161,14 +164,40 @@ public class Client {
     }
     public void receive() {
         try {
-            InputStreamReader inputStream =new InputStreamReader(cntSot.getInputStream(),whatCharSet);
+            ObjectInputStream objin = new ObjectInputStream(cntSot.getInputStream());
             char[] c= new char[10];
             int len = 0;
-            while((len = inputStream.read(c)) != -1)
+            while(true)
             {
-                System.out.print(new String(c, 0, len));
+                AbsDataPack date = (AbsDataPack)objin.readObject();
+                if(date.getDataType() == AbsType.CLOSE)
+                {
+                    close();
+                    break;
+                }
+                ArrayList<? extends AbsClientPlug> ableplugs = PlugProcess.judgeLegalPlugToInst(date, tempPlug);
+                if(ableplugs != null)
+                {
+                    int count = 0;
+                    for(var plug : ableplugs)
+                    {
+                        Consumer<AbsDataPack> printWay = plug.whenReceive(date, this);
+                        if(printWay != null)
+                        {
+                            printWay.accept(date);
+                        }
+                        else
+                        {
+                            count++;
+                        }
+                    }
+                    if(ableplugs.size() == count)
+                    {
+                        allPrintWay.accept(date.toString());
+                    }
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -189,8 +218,8 @@ public class Client {
         return isConnect;
     }
 
-    public Client(String ip) {
-        this();
+    public Client(String ip, Consumer<String> printWay, Supplier<String> inputWay) {
+        this(printWay, inputWay);
         if(ip != "1.1.1.1")
         try {
             this.cntSot = new Socket(InetAddress.getByName(ip),12221);
@@ -229,11 +258,11 @@ public class Client {
                 plugArrs.add(plug);
             }
         }
-        if(plugArrs.size() == 0)
-        {
-            plugArrs = matchPlug("chat");
-        }
-        else if(plugArrs.size() > 1)
+//        if(plugArrs.size() == 0)
+//        {
+//            plugArrs = matchPlug("chat");
+//        }
+        if(plugArrs.size() > 1)
         {
             AbsClientPlug front = plugArrs.get(0);
             for(AbsClientPlug plug : plugArrs)
@@ -311,11 +340,25 @@ public class Client {
         String start = getStartWith(str);
         tempStatement = str;
         ArrayList<AbsClientPlug<?, ?>> enablePlugList = matchPlug(split(str).get(0));
+        if(enablePlugList.size() == 0)
+        {
+            AbsDataPack<String> datepack = new AbsDataPack<>();
+            datepack.setDataType(anylizeType(start));
+            datepack.setStartWith(start);
+            datepack.setData(str);
+            allPrintWay.accept("(" + datepack.getDataType() + ")" + name + ":" + str);
+//            try {
+//                objout.writeObject(datepack);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+            return;
+        }
         AbsDataPack absDataPack = new AbsDataPack();
         absDataPack.setDataType(anylizeType(start));
         absDataPack.setClientname(name);
         absDataPack.setStartWith(start);
-        allPrintWay.accept(name + ":" + str);
+        allPrintWay.accept("(" + absDataPack.getDataType() + ")" + name + ":" + str);
         try
         {
             int localNum = 0;
@@ -342,6 +385,10 @@ public class Client {
             if(!isAllInLocal)
             {
                 objout.writeObject(absDataPack);
+            }
+            for(i = 0; i < enablePlugList.size(); i++)
+            {
+                enablePlugList.get(i).afterSend(absDataPack, this);
             }
             tempStatement = null;
         } catch (IOException e) {

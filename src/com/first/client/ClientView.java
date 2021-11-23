@@ -13,7 +13,7 @@ public class ClientView {
     Client client;
     private String whatCharSet = "gbk";
     public ClientView() {
-        this.client = new Client("110.42.191.58");
+        //this.client = new Client("110.42.191.58");
         if(client.isConnect())
         {
             System.out.println("连接成功!!!请输入你心仪的名字吧：");

@@ -38,7 +38,7 @@ public class GetPlugListPlug extends ClientNormalPlug{
         printWay.accept("正在使用的插件:");
         for(var plug : tempPlugs)
         {
-            printWay.accept(plug.getPlugName() + " : " + plug.getDescription());
+            printWay.accept(plug.getPlugName() + "(" + plug.getCtrlplugType() + ")" + " : " + plug.getDescription());
         }
     }
 }

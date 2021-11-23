@@ -5,6 +5,8 @@ import com.first.client.Client;
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
 
+import java.util.function.Consumer;
+
 /**
  * @author 原初
  * @create 2021 - 11 - 18
@@ -27,10 +29,6 @@ public class ClientNormalPlug extends AbsClientPlug<String, String>{
 
     }
 
-    @Override
-    public void sendMessage(AbsDataPack<String> Datapack, Client thisCli) {
-
-    }
 
     @Override
     public void afterSend(AbsDataPack<String> Datapack, Client thisCli) {
@@ -38,8 +36,8 @@ public class ClientNormalPlug extends AbsClientPlug<String, String>{
     }
 
     @Override
-    public void whenReceive(AbsDataPack<String> Datapack, Client thisCli) {
-
+    public Consumer<AbsDataPack> whenReceive(AbsDataPack<String> Datapack, Client thisCli) {
+        return null;
     }
 
     @Override

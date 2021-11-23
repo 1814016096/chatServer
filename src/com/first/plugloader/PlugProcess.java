@@ -3,6 +3,7 @@ package com.first.plugloader;
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsPlug;
 import com.first.plug.AbsType;
+import com.first.plug.client.AbsClientPlug;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -21,6 +22,32 @@ import java.util.jar.JarFile;
  * @version 0.0.2 插件的解析、处理、生成插件,包含两个静态方法
  */
 public class PlugProcess {
+    public static ArrayList<? extends AbsClientPlug> judgeLegalPlugToInst(AbsDataPack<?> datepack
+            , ArrayList<? extends AbsClientPlug> plugs)
+    {
+        ArrayList<AbsClientPlug> target = new ArrayList<>(plugs.size());
+        for (var plug : plugs) {
+            if (datepack.getDataType() == plug.getCtrlplugType())
+            {
+                //要判断三个相等：1.名字 2.类型 3.泛型的类型
+                boolean temp = datepack.getStartWith().equals(plug.getCtrlName());
+                if(temp)
+                {
+                    temp = datepack.getInnerData().getClass().getTypeName()
+                            .equals(plug.flag.getClass().getTypeName());
+                }
+                if (temp)
+                {
+                    target.add(plug);
+                }
+            }
+        }
+        if (target.size() != 0) {
+            return target;
+        } else {
+            return null;//已测试
+        }
+    }
     public static ArrayList<Class<? extends AbsPlug<?>>> judgeLegalPlug(AbsDataPack<?> datepack
             , ArrayList<Class<? extends AbsPlug<?>>> plugs) {
         ArrayList<Class<? extends AbsPlug<?>>> target = new ArrayList<>();

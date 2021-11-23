@@ -54,10 +54,12 @@ public class AbsDataPack<T> implements Serializable {
     public InputStream getInnerDataByInputStream() throws UnsupportedEncodingException {
         return new ByteArrayInputStream(this.innerData.toString().getBytes(charSet));
     }
-    public String getInnerDataBystring()
-    {
-        return this.innerData.toString();
+
+    @Override
+    public String toString() {
+        return innerData.toString();
     }
+
     private AbsType DataType = AbsType.CORE;
     public AbsType getDataType() {
         return DataType;
