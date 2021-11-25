@@ -13,11 +13,6 @@ import java.util.function.Consumer;
  */
 @ClientPlug(name = "CoreChat")
 public class ChatCore extends ClientNormalPlug{
-    private static Consumer<String> printWay = x -> System.out.println(x);
-    public static void setPrintWay(Consumer<String> printWay)
-    {
-        ChatCore.printWay = printWay;
-    }
     public ChatCore()
     {
         setSomting("", "核心的聊天插件，请置于最上层", AbsType.CHAT);

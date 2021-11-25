@@ -217,7 +217,11 @@ public class Client {
     public boolean isConnect() {
         return isConnect;
     }
-
+    public Client(String ip)
+    {
+        this(ip, null, null);
+        //默认用console输入输出
+    }
     public Client(String ip, Consumer<String> printWay, Supplier<String> inputWay) {
         this(printWay, inputWay);
         if(ip != "1.1.1.1")

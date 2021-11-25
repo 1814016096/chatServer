@@ -18,8 +18,5 @@ public class ClientTest {
     @Test
     public void temptest()
     {
-        //Client client = new Client("1.1.1.1");
-        //System.out.println(client.AnylizeType("woc!"));
-        //System.out.println(client.matchPlug("/plug"));
     }
 }
