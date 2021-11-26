@@ -11,12 +11,21 @@ import java.util.Scanner;
 public class ClientTest {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        Client client = new Client("1.1.1.1", System.out::println, scan::nextLine);
-        //SetName.setType(System.out::println, () -> scan.next());
-        client.say("/plug");
+        Client client = new Client("127.0.0.1", System.out::println, scan::nextLine);
+        while (true) {
+            client.say("???   woc");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //SetName.setType(System.out::println, () -> scan.next());
+            //client.say("/plug");
+        }
     }
     @Test
     public void temptest()
     {
+        System.out.println(System.getProperty("user.dir"));
     }
 }

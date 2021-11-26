@@ -1,11 +1,13 @@
 package com.first.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.first.datapack.AbsDataPack;
+import com.first.plug.AbsType;
+
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * @author 原初
@@ -13,9 +15,15 @@ import java.util.Collection;
  * @version 0.0.2 对内容的重构
  */
 public class CoreServer extends Thread{
+    static private Consumer<String> errMsg = System.err::println;
+    public static void setErrMsg(Consumer<String> out)
+    {
+        CoreServer.errMsg = out;
+    }
     private Socket thisSocket;
     private String name;
     private String content;//数据包想要传达的某些数据
+    ObjectInputStream input;
     public String getContent() {
         return content;
     }
@@ -42,7 +50,30 @@ public class CoreServer extends Thread{
     boolean isClose = false;
     public CoreServer(Socket thisSocket) {
         this.thisSocket = thisSocket;
-        this.others = others;
+        AbsDataPack<?> startDate = null;
+        try {
+            input = new ObjectInputStream(thisSocket.getInputStream());
+            startDate = (AbsDataPack<?>) input.readObject();
+        } catch (Exception e) {
+            errMsg.accept(e.getMessage());
+        }
+        if(startDate != null && startDate.getDataType() == AbsType.START)
+        {
+            this.name  = startDate.getName();
+        }
+        else
+        {
+            isClose = true;
+            try {
+                if(input != null)
+                {
+                    input.close();
+                }
+            } catch (IOException e) {
+                errMsg.accept(e.getMessage());
+            }
+
+        }
     }
     public void closeSocket()
     {
@@ -52,63 +83,43 @@ public class CoreServer extends Thread{
     public void run() {
         while (!isClose)
         {
-            OutputStream out = null;
-            InputStream inputStream = null;
-            try{
-                thisSocket.sendUrgentData(0xff);
-            }
-            catch (IOException e)
-            {
-//                try {
-////                    OutputStream tempout = others.get(0).getThisSocket().getOutputStream();
-////                    tempout.write("\\l ".getBytes("gbk"));
-////                    tempout.write(this.name.getBytes("gbk"));
-//                } catch (IOException ioException) {
-//                    ioException.printStackTrace();
-//                }
-                try {
-                    thisSocket.close();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-                isClose = true;
-                others.remove(this);
-                break;
-            }
+            AbsDataPack dateCon = null;
             try {
-                inputStream = thisSocket.getInputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
+                dateCon = (AbsDataPack) input.readObject();
+            } catch (Exception e) {
+                try{
+                    thisSocket.sendUrgentData(0xff);
+                }
+                catch (IOException es)
+                {
+                    try {
+                        thisSocket.close();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                    isClose = true;
+                    others.remove(this);
+                    break;
+                }
             }
-            int what = 0;
-            ArrayList<Integer> context = new ArrayList<>(10);
             try
             {
-                while ((what = inputStream.read()) != 127)
-                {
-                    context.add(what);
-                }
                 for (int i = 0; i < others.size(); i++)
                 {
                     CoreServer temp = others.get(i);
+                    System.out.println(dateCon);
                     if (this == temp)
                     {
                         continue;
                     }
-                    out = temp.getThisSocket().getOutputStream();
-                    for(int x : context)
-                    {
-                        out.write(x);
-                    }
-                    out.write("\n".getBytes());
-                    out.flush();
+                    ObjectOutputStream output = new ObjectOutputStream(temp.getThisSocket().getOutputStream());
+                    output.writeObject(dateCon);
                 }
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 continue;
             }
-            context.clear();
         }
     }
 }

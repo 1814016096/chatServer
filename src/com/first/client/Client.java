@@ -58,7 +58,8 @@ public class Client {
             this.allInputWay = inputWay;
         }
         AbsDataPack.setCharSet(whatCharSet);
-        File plugDir = new File(System.getProperty("user.dir") + "/chatServe" +"/clientPlug");
+        String mainTo = "/chatServe";
+        File plugDir = new File(System.getProperty("user.dir") + mainTo +"/clientPlug");
         //System.out.println(plugDir.getAbsolutePath());
         clientPlugs = new ArrayList<>(50);
         File[] plugs = plugDir.listFiles();
@@ -230,6 +231,7 @@ public class Client {
             OutputStream out = cntSot.getOutputStream();
             objout = new ObjectOutputStream(out);
             AbsDataPack<Object> startPack = new AbsDataPack<>();
+            startPack.setClientname(name);
             startPack.setDataType(AbsType.START);
             objout.writeObject(startPack);
             isConnect = true;

@@ -4,6 +4,7 @@ import com.first.Ann.ServerPlug;
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsPlug;
 import com.first.server.CoreServer;
+import com.first.server.ServerManager;
 
 /**
  * @author 原初
@@ -17,11 +18,12 @@ public abstract class AbsServerPlug<T> extends AbsPlug<T>{
     public AbsDataPack<T> getGettedPack() {
         return gettedPack;
     }
+    public abstract void whenInit(ServerManager manager);
     public void setGettedPack(AbsDataPack<T> gettedPack) {
         this.gettedPack = gettedPack;
     }
-    public abstract AbsDataPack<T> afterInput();//在接收到目标的内容之后该做的对数据包的处理
-    public abstract boolean filter(CoreServer otherClient);//写入的过滤器，过滤掉一些你不想要写入的客户端！
-    public abstract void beforeWrite();//写入之前呢?
-    public abstract void afterWriter();//在写入之后要做什么
+    public abstract AbsDataPack<T> afterInput(CoreServer whatSocket, AbsDataPack<T> gettedPack);//在接收到目标的内容之后该做的对数据包的处理
+    public abstract boolean filter(CoreServer otherSocket);//写入的过滤器，过滤掉一些你不想要写入的客户端！
+    public abstract void beforeWrite(CoreServer whatSocket);//写入之前呢?
+    public abstract void afterWriter(CoreServer whatSocket);//在写入之后要做什么
 }

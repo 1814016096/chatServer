@@ -16,9 +16,4 @@ public class CoreChat extends NormalPlug{
         setSomting("","聊天插件", AbsType.CHAT);
     }
 
-    @Override
-    public void beforeWrite() {
-        getGettedPack().setData("<" + getGettedPack().getName()
-                + ">" + getGettedPack().getInnerData());
-    }
 }
