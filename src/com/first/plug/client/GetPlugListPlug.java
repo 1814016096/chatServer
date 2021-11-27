@@ -15,6 +15,7 @@ import java.util.function.Consumer;
  */
 @ClientPlug(name = "getPlugs")
 public class GetPlugListPlug extends ClientNormalPlug{
+    static final long serialVersionUID = 85165960L;
     private static Consumer<String> printWay = x -> System.out.println(x);
     public static void setPrintWay(Consumer<String> printWay)
     {

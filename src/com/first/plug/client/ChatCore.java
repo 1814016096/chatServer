@@ -13,6 +13,7 @@ import java.util.function.Consumer;
  */
 @ClientPlug(name = "CoreChat")
 public class ChatCore extends ClientNormalPlug{
+    static final long serialVersionUID = 5120L;
     public ChatCore()
     {
         setSomting("", "核心的聊天插件，请置于最上层", AbsType.CHAT);
@@ -20,7 +21,7 @@ public class ChatCore extends ClientNormalPlug{
     }
     @Override
     public void processPack(AbsDataPack<String> Datapack, Client thisCli) {
-        Datapack.setData("<" + thisCli.getName() + ">" + thisCli.tempStatement);
+        Datapack.setData("<" + thisCli.getName() + ">"+ ":" + thisCli.tempStatement);
     }
     @Override
     public Consumer<AbsDataPack> whenReceive(AbsDataPack<String> Datapack, Client thisCli) {

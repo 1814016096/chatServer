@@ -27,13 +27,17 @@ public class PlugProcess {
     {
         ArrayList<AbsClientPlug> target = new ArrayList<>(plugs.size());
         for (var plug : plugs) {
+            if(plug.getPlugName().contains("Abs"))
+            {
+                continue;
+            }
             if (datepack.getDataType() == plug.getCtrlplugType())
             {
                 //要判断三个相等：1.名字 2.类型 3.泛型的类型
                 boolean temp = datepack.getStartWith().equals(plug.getCtrlName());
                 if(temp)
                 {
-                    temp = datepack.getInnerData().getClass().getTypeName()
+                    temp = datepack.toString().getClass().getTypeName()
                             .equals(plug.flag.getClass().getTypeName());
                 }
                 if (temp)

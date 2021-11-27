@@ -14,8 +14,11 @@ import java.util.function.Consumer;
  */
 @ClientPlug(name = "NormalPlug")
 public class ClientNormalPlug extends AbsClientPlug<String, String>{
+    static final long serialVersionUID = 15102L;
+    public ClientNormalPlug()
     {
         initFlag = "un";
+        flag = "date";
         setSomting("", "一个默认插件", AbsType.CHAT);
         setInitCtrlPackType(AbsType.CHAT);
         isLocal = true;

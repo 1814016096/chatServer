@@ -14,6 +14,14 @@ public class ServerTest {
 
     public static void main(String[] args) {
         ServerManager serm = new ServerManager();
-        serm.addCnt();
+        while (true)
+        {
+            serm.addCnt();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -14,7 +14,8 @@ import java.util.function.Consumer;
  * @create 2021 - 11 - 04
  * @version 0.0.2 对内容的重构
  */
-public class CoreServer extends Thread{
+public class CoreServer extends Thread implements Serializable{
+    static final long serialVersionUID = -85120105L;
     static private Consumer<String> errMsg = System.err::println;
     public static void setErrMsg(Consumer<String> out)
     {
@@ -79,6 +80,16 @@ public class CoreServer extends Thread{
     {
         isClose = true;
     }
+    class MyObjectOutputStream  extends ObjectOutputStream{
+
+        public MyObjectOutputStream(OutputStream out) throws IOException {
+            super(out);
+        }
+        @Override
+        public void writeStreamHeader() throws IOException{
+            return;
+        }
+    }
     @Override
     public void run() {
         while (!isClose)
@@ -104,15 +115,25 @@ public class CoreServer extends Thread{
             }
             try
             {
+                int cnt = 0;
                 for (int i = 0; i < others.size(); i++)
                 {
                     CoreServer temp = others.get(i);
-                    System.out.println(dateCon);
+                    //System.out.println(dateCon);
                     if (this == temp)
                     {
                         continue;
                     }
-                    ObjectOutputStream output = new ObjectOutputStream(temp.getThisSocket().getOutputStream());
+                    ObjectOutputStream output = null;
+                    if(cnt == 0)
+                    {
+                        output = new ObjectOutputStream(temp.getThisSocket().getOutputStream());
+                        cnt++;
+                    }
+                    else
+                    {
+                        output = new MyObjectOutputStream(temp.getThisSocket().getOutputStream());
+                    }
                     output.writeObject(dateCon);
                 }
             }

@@ -14,6 +14,7 @@ import java.util.function.Supplier;
  */
 @ClientPlug(name = "GetName")
 public class SetName extends ClientNormalPlug{
+    static final long serialVersionUID = 841521L;
     public SetName()
     {
         setSomting("null", "让客户端获取用户名字", AbsType.CORE);

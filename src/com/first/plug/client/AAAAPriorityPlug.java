@@ -14,6 +14,8 @@ import java.util.ArrayList;
  */
 @ClientPlug(name = "priorityPlug")
 public class AAAAPriorityPlug extends ClientNormalPlug {
+    static final long serialVersionUID = 16203L;
+    protected String proDir = "/properties_dir";
     public AAAAPriorityPlug()
     {
         setSomting("null", "一个为插件排序的插件", AbsType.CORE);
@@ -22,7 +24,7 @@ public class AAAAPriorityPlug extends ClientNormalPlug {
     @Override
     public void whenInit(Client thisCli) {
         ArrayList<AbsClientPlug> tempPlugs = thisCli.getTempPlug();
-        File props = new File(System.getProperty("user.dir") + "/properties_dir/pri.properties");
+        File props = new File(System.getProperty("user.dir") + proDir + "/pri.properties");
         if(!props.exists())
         {
             File propdir = new File(System.getProperty("user.dir") + "/properties_dir");

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  * @version 0.0.1
  */
 public class Client {
+    ObjectInputStream objin = null;
     public String tempStatement;
     ArrayList<Class<? extends AbsPlug<?>>> clientPlugs;
     ArrayList<AbsClientPlug> tempPlug;
@@ -48,7 +49,7 @@ public class Client {
         return tempPlug;
     }
 
-    private Client(Consumer<String> printWay, Supplier<String> inputWay){
+    private Client(Consumer<String> printWay, Supplier<String> inputWay, String dir){
         if(printWay != null)
         {
             this.allPrintWay = printWay;
@@ -59,7 +60,7 @@ public class Client {
         }
         AbsDataPack.setCharSet(whatCharSet);
         String mainTo = "/chatServe";
-        File plugDir = new File(System.getProperty("user.dir") + mainTo +"/clientPlug");
+        File plugDir = new File(System.getProperty("user.dir") + mainTo + dir);
         //System.out.println(plugDir.getAbsolutePath());
         clientPlugs = new ArrayList<>(50);
         File[] plugs = plugDir.listFiles();
@@ -163,13 +164,13 @@ public class Client {
             System.exit(0);
         }
     }
-    public void receive() {
+
+
+        public void receive() {
         try {
-            ObjectInputStream objin = new ObjectInputStream(cntSot.getInputStream());
-            char[] c= new char[10];
-            int len = 0;
             while(true)
             {
+                objin = new ObjectInputStream(cntSot.getInputStream());
                 AbsDataPack date = (AbsDataPack)objin.readObject();
                 if(date.getDataType() == AbsType.CLOSE)
                 {
@@ -218,13 +219,19 @@ public class Client {
     public boolean isConnect() {
         return isConnect;
     }
+
     public Client(String ip)
     {
-        this(ip, null, null);
+        this(ip, null, null, "/clientPlug");
         //默认用console输入输出
     }
-    public Client(String ip, Consumer<String> printWay, Supplier<String> inputWay) {
-        this(printWay, inputWay);
+
+    public Client(String ip, Consumer<String> allPrintWay, Supplier<String> allInputWay) {
+        this(ip, allPrintWay, allInputWay, "/clientPlug");
+    }
+
+    public Client(String ip, Consumer<String> printWay, Supplier<String> inputWay, String dir) {
+        this(printWay, inputWay, dir);
         if(ip != "1.1.1.1")
         try {
             this.cntSot = new Socket(InetAddress.getByName(ip),12221);

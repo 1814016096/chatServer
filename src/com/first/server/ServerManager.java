@@ -1,5 +1,6 @@
 package com.first.server;
 
+import com.first.client.Client;
 import com.first.plug.AbsPlug;
 import com.first.plug.client.AbsClientPlug;
 import com.first.plug.server.AbsServerPlug;
@@ -20,7 +21,7 @@ public class ServerManager {
     ArrayList<AbsServerPlug<?>> serverPlugs = new ArrayList<>(20);
     ArrayList<CoreServer> all;
     ServerSocket serSoc;//服务器socket
-    //Client serverClient;
+    Client serverClient;
     private String whatCharSet = "gbk";
     private Consumer<String> allPrintWay = System.out::println;
     private Supplier<String> allInputWay = () ->{
@@ -78,13 +79,16 @@ public class ServerManager {
             for (var instance : serverPlugs) {
                 instance.whenInit(this);
             }
-            //serverClient = new Client("127.0.0.1", allPrintWay, allInputWay);
         }
         try {
             serSoc = new ServerSocket(12221);
         } catch (IOException e) {
             allPrintWay.accept(e.getMessage());
         }
+        serverClient = new Client("127.0.0.1", allPrintWay, allInputWay, "/serverClientPlug");
+        new Thread(() -> {
+            serverClient.receive();
+        }).start();
     }
     public void addCnt() {
         Socket accept = null;
