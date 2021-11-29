@@ -168,9 +168,9 @@ public class Client {
 
         public void receive() {
         try {
+            objin = new ObjectInputStream(cntSot.getInputStream());
             while(true)
             {
-                objin = new ObjectInputStream(cntSot.getInputStream());
                 AbsDataPack date = (AbsDataPack)objin.readObject();
                 if(date == null)
                 {
