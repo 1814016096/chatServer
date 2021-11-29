@@ -9,11 +9,18 @@ import java.util.Scanner;
  * @create 2021 - 11 - 17
  */
 public class ClientTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Scanner scan = new Scanner(System.in);
         Client client = new Client("127.0.0.1", System.out::println, scan::nextLine);
+        client.say("/num");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                client.receive();
+            }
+        }).start();
         while (true) {
-            client.say("???   woc");
+            client.say("/num");
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

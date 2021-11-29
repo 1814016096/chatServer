@@ -32,7 +32,6 @@ public class AbsDataPack<T> implements Serializable {
     public void setStartWith(String startWith) {
         this.startWith = startWith;
     }
-    private CoreServer whatCoreServer;//是哪个客户端socket发送的数据?
     private String Clientname;//客户端名字
     public void setClientname(String clientname) {
         Clientname = clientname;

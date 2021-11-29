@@ -6,6 +6,8 @@ import com.first.plug.AbsType;
 import com.first.server.CoreServer;
 import com.first.server.ServerManager;
 
+import java.util.ArrayList;
+
 /**
  * @author 原初
  * @create 2021 - 11 - 10
@@ -24,12 +26,12 @@ public class NormalPlug extends AbsServerPlug<String>{
     }
 
     @Override
-    public AbsDataPack<String> afterInput(CoreServer whatSocket, AbsDataPack<String> gettedPack) {
+    public AbsDataPack<String> afterInput(CoreServer coreServer) {
         return null;
     }
 
     @Override
-    public boolean filter(CoreServer otherClient) {
+    public boolean filter(CoreServer otherClient, ArrayList<CoreServer> others) {
         return true;
     }
 
@@ -40,6 +42,11 @@ public class NormalPlug extends AbsServerPlug<String>{
 
     @Override
     public void afterWriter(CoreServer whatSocket) {
+
+    }
+
+    @Override
+    public void afterReceive(CoreServer whatSocket) {
 
     }
 

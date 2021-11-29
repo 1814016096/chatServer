@@ -8,10 +8,13 @@ import com.first.plugloader.PlugProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,6 +25,7 @@ public class ServerManager {
     ArrayList<CoreServer> all;
     ServerSocket serSoc;//服务器socket
     Client serverClient;
+    Map<CoreServer, ObjectOutputStream> allObjOut;
     private String whatCharSet = "gbk";
     private Consumer<String> allPrintWay = System.out::println;
     private Supplier<String> allInputWay = () ->{
@@ -35,6 +39,7 @@ public class ServerManager {
     public ServerManager(Consumer<String> allPrintWay, Supplier<String> allInputWay) {
         all = new ArrayList<>(20);
         serverPlugsCl = new ArrayList<>(20);
+        allObjOut = new HashMap<>();
         String mainTo = "/chatServe";
         File plugDir = new File(System.getProperty("user.dir") + mainTo + "\\serverplug");
         File[] plugs = plugDir.listFiles();
@@ -94,11 +99,15 @@ public class ServerManager {
         Socket accept = null;
         try {
             accept = serSoc.accept();
-            CoreServer coreServer = new CoreServer(accept);
+            CoreServer coreServer = new CoreServer(accept, this.serverPlugs, allObjOut);
             all.add(coreServer);
             coreServer.setOthers(all);
             coreServer.start();
             System.out.println(coreServer.getClientName());
+            for(var plug : serverPlugs)
+            {
+                plug.afterReceive(coreServer);
+            }
         } catch (IOException e) {
             allPrintWay.accept(e.getMessage());
         }

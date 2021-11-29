@@ -2,11 +2,14 @@ package com.first.server;
 
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
+import com.first.plug.server.AbsServerPlug;
+import com.first.plugloader.PlugProcess;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -34,6 +37,7 @@ public class CoreServer extends Thread implements Serializable{
     public String getClientName() {
         return name;
     }
+    ArrayList<? extends AbsServerPlug> plugs;
     public void setClientName(String name) {
         this.name = name;
     }
@@ -49,8 +53,23 @@ public class CoreServer extends Thread implements Serializable{
         CoreServer.others = others;
     }
     boolean isClose = false;
-    public CoreServer(Socket thisSocket) {
+    private Map<CoreServer, ObjectOutputStream> allOut;
+    private void addOut()
+    {
+        synchronized (this.allOut)
+        {
+            try {
+                allOut.put(this, new ObjectOutputStream(this.getThisSocket().getOutputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public CoreServer(Socket thisSocket, ArrayList<? extends AbsServerPlug> plugs
+            , Map<CoreServer, ObjectOutputStream> allOut) {
+        this.plugs = plugs;
         this.thisSocket = thisSocket;
+        this.allOut = allOut;
         AbsDataPack<?> startDate = null;
         try {
             input = new ObjectInputStream(thisSocket.getInputStream());
@@ -73,7 +92,6 @@ public class CoreServer extends Thread implements Serializable{
             } catch (IOException e) {
                 errMsg.accept(e.getMessage());
             }
-
         }
     }
     public void closeSocket()
@@ -92,6 +110,7 @@ public class CoreServer extends Thread implements Serializable{
     }
     @Override
     public void run() {
+        addOut();
         while (!isClose)
         {
             AbsDataPack dateCon = null;
@@ -113,28 +132,56 @@ public class CoreServer extends Thread implements Serializable{
                     break;
                 }
             }
+            ArrayList<? extends AbsServerPlug> enable =
+                    PlugProcess.judgeLegalPlugByServer(dateCon, this.plugs);
+            for(var plug : enable)
+            {
+                plug.setGettedPack(dateCon);
+                dateCon = plug.afterInput(this);
+            }
             try
             {
                 int cnt = 0;
                 for (int i = 0; i < others.size(); i++)
                 {
                     CoreServer temp = others.get(i);
-                    //System.out.println(dateCon);
-                    if (this == temp)
-                    {
-                        continue;
-                    }
+//                    if (this == temp)
+//                    {
+//                        continue;
+//                    }
                     ObjectOutputStream output = null;
-                    if(cnt == 0)
+//                    if(cnt == 0)
+//                    {
+//                        output = new ObjectOutputStream(temp.getThisSocket().getOutputStream());
+//                    }
+//                    else
+//                    {
+//                        output = new MyObjectOutputStream(temp.getThisSocket().getOutputStream());
+//                    }
+                    //output = new MyObjectOutputStream(temp.getThisSocket().getOutputStream());
+                    output = allOut.get(temp);
+                    boolean isWriter = true;
+                    for(var plug : enable)
                     {
-                        output = new ObjectOutputStream(temp.getThisSocket().getOutputStream());
+                        if(!(isWriter = plug.filter(temp ,others)))
+                        {
+                            break;
+                        }
+                    }
+                    if(isWriter)
+                    {
+                        for(var plug : enable)
+                        {
+                            plug.beforeWrite(this);
+                        }
+                        System.out.println(temp.getClientName());
+                        output.writeObject(dateCon);
                         cnt++;
+                        for(var plug : enable)
+                        {
+                            plug.afterWriter(this);
+                        }
                     }
-                    else
-                    {
-                        output = new MyObjectOutputStream(temp.getThisSocket().getOutputStream());
-                    }
-                    output.writeObject(dateCon);
                 }
             }
             catch (Exception e)

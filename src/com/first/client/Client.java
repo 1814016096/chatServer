@@ -172,6 +172,10 @@ public class Client {
             {
                 objin = new ObjectInputStream(cntSot.getInputStream());
                 AbsDataPack date = (AbsDataPack)objin.readObject();
+                if(date == null)
+                {
+                    continue;
+                }
                 if(date.getDataType() == AbsType.CLOSE)
                 {
                     close();
@@ -302,13 +306,9 @@ public class Client {
         {
             return "";
         }
-        else if(absType == AbsType.COMMAND)
-        {
-            return "/";
-        }
         else
         {
-            return startWith.substring(0,1);
+            return split(startWith).get(0);
         }
     }
     public AbsType anylizeType(String startWith)
@@ -356,15 +356,16 @@ public class Client {
         if(enablePlugList.size() == 0)
         {
             AbsDataPack<String> datepack = new AbsDataPack<>();
+            datepack.setClientname(name);
             datepack.setDataType(anylizeType(start));
             datepack.setStartWith(start);
             datepack.setData(str);
             allPrintWay.accept("(" + datepack.getDataType() + ")" + name + ":" + str);
-//            try {
-//                objout.writeObject(datepack);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                objout.writeObject(datepack);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return;
         }
         AbsDataPack absDataPack = new AbsDataPack();
@@ -394,7 +395,7 @@ public class Client {
                     plug.processPack(absDataPack, this);
                 }
             }
-            isAllInLocal = (i == localNum);
+            isAllInLocal = ((i == localNum) && enablePlugList.size() != 0);
             if(!isAllInLocal)
             {
                 objout.writeObject(absDataPack);
