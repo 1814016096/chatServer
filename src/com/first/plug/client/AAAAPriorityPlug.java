@@ -27,7 +27,7 @@ public class AAAAPriorityPlug extends ClientNormalPlug {
         File props = new File(System.getProperty("user.dir") + proDir + "/pri.properties");
         if(!props.exists())
         {
-            File propdir = new File(System.getProperty("user.dir") + "/properties_dir");
+            File propdir = new File(System.getProperty("user.dir") + proDir);
             propdir.mkdirs();
             try(OutputStream out = new FileOutputStream(props)){
 
@@ -61,7 +61,7 @@ public class AAAAPriorityPlug extends ClientNormalPlug {
                         }
                     }
                 }
-                if(!"priorityPlug".equals(temp.get(0).getPlugName()))
+                if(!getPlugName().equals(temp.get(0).getPlugName()))
                     temp.get(0).whenInit(thisCli);
             } catch (IOException e) {
                 e.printStackTrace();

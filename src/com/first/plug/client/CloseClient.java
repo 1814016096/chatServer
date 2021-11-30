@@ -9,23 +9,25 @@ import java.util.function.Consumer;
 
 /**
  * @author 原初
- * @create 2021 - 11 - 21
- * @version 0.1.0 客户端核心的聊天插件
+ * @create 2021 - 11 - 30
  */
-@ClientPlug(name = "CoreChat")
-public class ChatCore extends ClientNormalPlug{
-    static final long serialVersionUID = 5120L;
-    public ChatCore()
+@ClientPlug(name = "clientClose")
+public class CloseClient extends ClientNormalPlug{
+    public CloseClient()
     {
-        setSomting("", "核心的聊天插件，请置于最上层", AbsType.CHAT);
-        isLocal = false;
+        setSomting("/close", "关闭客户端", AbsType.COMMAND);
+        setInitCtrlPackType(AbsType.COMMAND);
+        isLocal = true;
     }
+
     @Override
     public void processPack(AbsDataPack<String> Datapack, Client thisCli) {
-        Datapack.setData("<" + thisCli.getName() + ">"+ ":" + thisCli.tempStatement);
+        thisCli.close();
     }
+
     @Override
     public Consumer<AbsDataPack> whenReceive(AbsDataPack<String> Datapack, Client thisCli) {
+        thisCli.close();
         return null;
     }
 }

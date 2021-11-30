@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
 /**
  * @author 原初
  * @create 2021 - 11 - 10
- * @version 0.0.2 插件的解析、处理、生成插件,包含两个静态方法
+ * @version 0.1.0 插件的解析、处理、生成插件实例。
  */
 public class PlugProcess {
     public static ArrayList<? extends AbsServerPlug> judgeLegalPlugByServer(AbsDataPack<?> datepack

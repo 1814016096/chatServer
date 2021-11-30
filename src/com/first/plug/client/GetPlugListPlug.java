@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * @author 原初
  * @create 2021 - 11 - 19
- * @version 0.0.2 获得插件列表
+ * @version 0.1.0 获得插件列表
  */
 @ClientPlug(name = "getPlugs")
 public class GetPlugListPlug extends ClientNormalPlug{

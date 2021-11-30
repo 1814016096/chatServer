@@ -4,25 +4,18 @@ import com.first.Ann.DatePack;
 import com.first.plug.AbsType;
 import com.first.server.CoreServer;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
  * @author 原初
  * @create 2021 - 11 - 09
- * @version 0.0.2 数据包的抽象类
+ * @version 0.1.0 数据包的抽象类
  */
 @DatePack(name = "AbsPack")//抽象的包，所有的数据包都要继承这个
 public class AbsDataPack<T> implements Serializable {
     static final long serialVersionUID = 19198L;
     private String startWith;
-    private static String charSet = "gbk";
-    public static String getCharSet() {
-        return charSet;
-    }
     public static void setCharSet(String charSet) {
         charSet = charSet;
     }
@@ -50,10 +43,6 @@ public class AbsDataPack<T> implements Serializable {
     {
         return this.innerData;
     }
-    public InputStream getInnerDataByInputStream() throws UnsupportedEncodingException {
-        return new ByteArrayInputStream(this.innerData.toString().getBytes(charSet));
-    }
-
     @Override
     public String toString() {
         return innerData.toString();

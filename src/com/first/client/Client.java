@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * @author 原初
  * @create 2021 - 11 - 04
- * @version 0.0.1
+ * @version 0.1.0 一个支持插件的Client类
  */
 public class Client {
     ObjectInputStream objin = null;
@@ -45,6 +45,10 @@ public class Client {
         return whatCharSet;
     }
 
+    public boolean isThisIsColse() {
+        return thisIsColse;
+    }
+
     public ArrayList<AbsClientPlug> getTempPlug() {
         return tempPlug;
     }
@@ -59,7 +63,7 @@ public class Client {
             this.allInputWay = inputWay;
         }
         AbsDataPack.setCharSet(whatCharSet);
-        String mainTo = "/chatServe";
+        String mainTo = "/chatServe/";
         File plugDir = new File(System.getProperty("user.dir") + mainTo + dir);
         //System.out.println(plugDir.getAbsolutePath());
         clientPlugs = new ArrayList<>(50);
@@ -133,10 +137,7 @@ public class Client {
                 OutputStream outputStream = null;
                 ObjectOutputStream out = null;
                 try {
-
-                    outputStream = cntSot.getOutputStream();
-                    out = new ObjectOutputStream(outputStream);
-                    out.writeObject(normal);
+                    objout.writeObject(normal);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }finally {
@@ -169,7 +170,7 @@ public class Client {
         public void receive() {
         try {
             objin = new ObjectInputStream(cntSot.getInputStream());
-            while(true)
+            while(!isThisIsColse())
             {
                 AbsDataPack date = (AbsDataPack)objin.readObject();
                 if(date == null)
@@ -226,19 +227,18 @@ public class Client {
 
     public Client(String ip)
     {
-        this(ip, null, null, "/clientPlug");
+        this(12221 ,ip, null, null, "/clientPlug");
         //默认用console输入输出
     }
 
     public Client(String ip, Consumer<String> allPrintWay, Supplier<String> allInputWay) {
-        this(ip, allPrintWay, allInputWay, "/clientPlug");
+        this(12221,ip, allPrintWay, allInputWay, "/clientPlug");
     }
 
-    public Client(String ip, Consumer<String> printWay, Supplier<String> inputWay, String dir) {
+    public Client(int port, String ip, Consumer<String> printWay, Supplier<String> inputWay, String dir) {
         this(printWay, inputWay, dir);
-        if(ip != "1.1.1.1")
         try {
-            this.cntSot = new Socket(InetAddress.getByName(ip),12221);
+            this.cntSot = new Socket(InetAddress.getByName(ip),port);
             OutputStream out = cntSot.getOutputStream();
             objout = new ObjectOutputStream(out);
             AbsDataPack<Object> startPack = new AbsDataPack<>();
@@ -251,6 +251,7 @@ public class Client {
             e.printStackTrace();
             System.out.println("连接失败");
             isConnect = false;
+            close();
             System.exit(0);
         }
     }
@@ -333,7 +334,7 @@ public class Client {
             return AbsType.CHAT;
         }
     }
-    public List<String> split(String statement)
+    public static List<String> split(String statement)
     {
         String[] temp = statement.split(" ");
         List<String> collect = Arrays.stream(temp).filter(x -> !("".equals(x) || " ".equals(x))).collect(Collectors.toList());
@@ -372,7 +373,7 @@ public class Client {
         absDataPack.setDataType(anylizeType(start));
         absDataPack.setClientname(name);
         absDataPack.setStartWith(start);
-        allPrintWay.accept("(" + absDataPack.getDataType() + ")" + name + ":" + str);
+        //allPrintWay.accept("(" + absDataPack.getDataType() + ")" + name + ":" + str);
         try
         {
             int localNum = 0;
@@ -420,6 +421,7 @@ public class Client {
                     }
                 } catch (IOException exception) {
                     System.err.println("连接失败，服务器真的崩了");
+                    close();
                     System.exit(-11);
                 }
             }

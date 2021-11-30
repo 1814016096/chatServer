@@ -18,7 +18,11 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
+/**
+ * @author 原初
+ * @create 2021 - 11 - 04
+ * @version 0.1.0 对核心Sever的管理类
+ */
 public class ServerManager {
     ArrayList<Class<? extends AbsPlug>> serverPlugsCl;
     ArrayList<AbsServerPlug<?>> serverPlugs = new ArrayList<>(20);
@@ -90,7 +94,7 @@ public class ServerManager {
         } catch (IOException e) {
             allPrintWay.accept(e.getMessage());
         }
-        serverClient = new Client("127.0.0.1", allPrintWay, allInputWay, "/serverClientPlug");
+        serverClient = new Client(12221,"127.0.0.1", allPrintWay, allInputWay, "/serverClientPlug");
         new Thread(() -> {
             serverClient.receive();
         }).start();

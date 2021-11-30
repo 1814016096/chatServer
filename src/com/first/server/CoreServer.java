@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * @author 原初
  * @create 2021 - 11 - 04
- * @version 0.0.2 对内容的重构
+ * @version 0.1.0 一个支持插件的核心Server
  */
 public class CoreServer extends Thread implements Serializable{
     static final long serialVersionUID = -85120105L;
@@ -98,16 +98,6 @@ public class CoreServer extends Thread implements Serializable{
     {
         isClose = true;
     }
-    class MyObjectOutputStream  extends ObjectOutputStream{
-
-        public MyObjectOutputStream(OutputStream out) throws IOException {
-            super(out);
-        }
-        @Override
-        public void writeStreamHeader() throws IOException{
-            return;
-        }
-    }
     @Override
     public void run() {
         addOut();
@@ -116,6 +106,13 @@ public class CoreServer extends Thread implements Serializable{
             AbsDataPack dateCon = null;
             try {
                 dateCon = (AbsDataPack) input.readObject();
+                if(dateCon.getDataType() == AbsType.CLOSE)
+                {
+                    isClose = true;
+                    others.remove(this);
+                    allOut.remove(this);
+                    break;
+                }
             } catch (Exception e) {
                 try{
                     thisSocket.sendUrgentData(0xff);
@@ -129,11 +126,17 @@ public class CoreServer extends Thread implements Serializable{
                     }
                     isClose = true;
                     others.remove(this);
+                    allOut.remove(this);
                     break;
                 }
             }
             ArrayList<? extends AbsServerPlug> enable =
                     PlugProcess.judgeLegalPlugByServer(dateCon, this.plugs);
+            if(enable == null){
+                dateCon.setDataType(AbsType.CHAT);
+                dateCon.setStartWith("");
+                enable = PlugProcess.judgeLegalPlugByServer(dateCon, this.plugs);
+            }
             for(var plug : enable)
             {
                 plug.setGettedPack(dateCon);
@@ -145,20 +148,7 @@ public class CoreServer extends Thread implements Serializable{
                 for (int i = 0; i < others.size(); i++)
                 {
                     CoreServer temp = others.get(i);
-//                    if (this == temp)
-//                    {
-//                        continue;
-//                    }
                     ObjectOutputStream output = null;
-//                    if(cnt == 0)
-//                    {
-//                        output = new ObjectOutputStream(temp.getThisSocket().getOutputStream());
-//                    }
-//                    else
-//                    {
-//                        output = new MyObjectOutputStream(temp.getThisSocket().getOutputStream());
-//                    }
-                    //output = new MyObjectOutputStream(temp.getThisSocket().getOutputStream());
                     output = allOut.get(temp);
                     boolean isWriter = true;
                     for(var plug : enable)
@@ -174,7 +164,6 @@ public class CoreServer extends Thread implements Serializable{
                         {
                             plug.beforeWrite(this);
                         }
-                        System.out.println(temp.getClientName());
                         output.writeObject(dateCon);
                         cnt++;
                         for(var plug : enable)

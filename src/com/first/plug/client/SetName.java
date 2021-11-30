@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 /**
  * @author 原初
  * @create 2021 - 11 - 21
+ * @version 0.1.0 客户端获得明知道插件
  */
 @ClientPlug(name = "GetName")
 public class SetName extends ClientNormalPlug{
