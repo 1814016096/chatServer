@@ -1,11 +1,13 @@
 package com.first.plug.server;
 
 import com.first.Ann.ServerPlug;
+import com.first.client.Client;
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
 import com.first.server.CoreServer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 原初
@@ -28,10 +30,19 @@ public class GetNum extends NormalPlug{
 
     @Override
     public AbsDataPack<String> afterInput(CoreServer coreServer) {
-        //AbsDataPack<String> date = new AbsDataPack<>();
-        getGettedPack().setDataType(AbsType.CHAT);
+        List<String> statement = Client.split(getGettedPack().toString());
+        StringBuilder detail = new StringBuilder("在线:" + coreServer.getOthers().size() + "人");
+        if(statement.size() == 2 && "-d".equals(statement.get(1)))
+        {
+            detail.append("\n分别为:");
+            for(var people : coreServer.getOthers())
+            {
+                detail.append("\n" + people.getClientName());
+            }
+        }
+        getGettedPack().setDataType(AbsType.INFO);
         getGettedPack().setStartWith("");
-        getGettedPack().setData("在线:" + coreServer.getOthers().size() + "人");
+        getGettedPack().setData(detail.toString());
         return getGettedPack();
     }
 }

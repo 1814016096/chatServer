@@ -5,7 +5,10 @@ import com.first.plug.AbsType;
 import com.first.plug.server.AbsServerPlug;
 import com.first.plugloader.PlugProcess;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +57,11 @@ public class CoreServer extends Thread implements Serializable{
     }
     boolean isClose = false;
     private Map<CoreServer, ObjectOutputStream> allOut;
+
+    public Map<CoreServer, ObjectOutputStream> getAllOut() {
+        return allOut;
+    }
+
     private void addOut()
     {
         synchronized (this.allOut)
@@ -68,8 +76,8 @@ public class CoreServer extends Thread implements Serializable{
     public CoreServer(Socket thisSocket, ArrayList<? extends AbsServerPlug> plugs
             , Map<CoreServer, ObjectOutputStream> allOut) {
         this.plugs = plugs;
-        this.thisSocket = thisSocket;
         this.allOut = allOut;
+        this.thisSocket = thisSocket;
         AbsDataPack<?> startDate = null;
         try {
             input = new ObjectInputStream(thisSocket.getInputStream());
@@ -93,14 +101,49 @@ public class CoreServer extends Thread implements Serializable{
                 errMsg.accept(e.getMessage());
             }
         }
+        addOut();
     }
     public void closeSocket()
     {
         isClose = true;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CoreServer that = (CoreServer) o;
+        if (thisSocket != null ? !thisSocket.equals(that.thisSocket) : that.thisSocket != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (content != null ? !content.equals(that.content) : that.content != null) return false;
+        if (input != null ? !input.equals(that.input) : that.input != null) return false;
+        return plugs != null ? plugs.equals(that.plugs) : that.plugs == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (input != null ? input.hashCode() : 0);
+        return result;
+    }
+    void whenDisconnection()
+    {
+        for(var plug : plugs)
+        {
+            plug.whenClientDisconnection(this);
+        }
+        isClose = true;
+        try {
+            thisSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        others.remove(this);
+        allOut.remove(this);
+        return;
+    }
     @Override
     public void run() {
-        addOut();
         while (!isClose)
         {
             AbsDataPack dateCon = null;
@@ -108,9 +151,7 @@ public class CoreServer extends Thread implements Serializable{
                 dateCon = (AbsDataPack) input.readObject();
                 if(dateCon.getDataType() == AbsType.CLOSE)
                 {
-                    isClose = true;
-                    others.remove(this);
-                    allOut.remove(this);
+                    whenDisconnection();
                     break;
                 }
             } catch (Exception e) {
@@ -119,14 +160,7 @@ public class CoreServer extends Thread implements Serializable{
                 }
                 catch (IOException es)
                 {
-                    try {
-                        thisSocket.close();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                    isClose = true;
-                    others.remove(this);
-                    allOut.remove(this);
+                    whenDisconnection();
                     break;
                 }
             }

@@ -17,6 +17,40 @@ public class ClientFactory {
     private static int port = 12221;
     private static Class startClass;
     private static String plugDir = "clientPlug";
+
+
+    public static String getIp() {
+        return ip;
+    }
+
+    public static void setIp(String ip) {
+        ClientFactory.ip = ip;
+    }
+
+    public static int getPort() {
+        return port;
+    }
+
+    public static void setPort(int port) {
+        ClientFactory.port = port;
+    }
+
+    public static Class getStartClass() {
+        return startClass;
+    }
+
+    public static void setStartClass(Class startClass) {
+        ClientFactory.startClass = startClass;
+    }
+
+    public static String getPlugDir() {
+        return plugDir;
+    }
+
+    public static void setPlugDir(String plugDir) {
+        ClientFactory.plugDir = plugDir;
+    }
+
     static {
         String mainTo = "/chatServe";
         File properFile = new File(System.getProperty("user.dir") + mainTo + "/clientStart.properties");

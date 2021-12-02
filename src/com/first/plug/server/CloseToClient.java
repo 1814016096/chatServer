@@ -6,6 +6,7 @@ import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
 import com.first.server.CoreServer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class CloseToClient extends NormalPlug{
             }catch (Exception e)
             {
                 e.printStackTrace();
+                return getGettedPack();
             }
             enable = true;
         }
@@ -40,12 +42,18 @@ public class CloseToClient extends NormalPlug{
 
     @Override
     public boolean filter(CoreServer otherClient, ArrayList<CoreServer> others) {
-        for(var client : others)
+        if(otherClient.getClientName().equals(clientName) && !clientName.equals("server"))
         {
-            if(client.getClientName().equals(clientName))
-            {
-                return true;
+            AbsDataPack<String> getnews = new AbsDataPack<>();
+            getnews.setDataType(AbsType.INFO);
+            getnews.setData("亲爱的用户，服务器把你踢了");
+            getnews.setStartWith("");
+            try {
+                otherClient.getAllOut().get(otherClient).writeObject(getnews);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            return true;
         }
         return false;
     }

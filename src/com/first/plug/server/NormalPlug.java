@@ -50,4 +50,9 @@ public class NormalPlug extends AbsServerPlug<String>{
 
     }
 
+    @Override
+    public void whenClientDisconnection(CoreServer disServer) {
+
+    }
+
 }

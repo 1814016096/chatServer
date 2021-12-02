@@ -1,10 +1,11 @@
 package com.first.server;
 
-import com.first.client.Client;
+import com.first.factory.ClientFactory;
 import com.first.plug.AbsPlug;
 import com.first.plug.client.AbsClientPlug;
 import com.first.plug.server.AbsServerPlug;
 import com.first.plugloader.PlugProcess;
+import com.first.view.AbsClientView;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class ServerManager {
     ArrayList<AbsServerPlug<?>> serverPlugs = new ArrayList<>(20);
     ArrayList<CoreServer> all;
     ServerSocket serSoc;//服务器socket
-    Client serverClient;
+    AbsClientView serverClient;
     Map<CoreServer, ObjectOutputStream> allObjOut;
     private String whatCharSet = "gbk";
     private Consumer<String> allPrintWay = System.out::println;
@@ -94,20 +95,18 @@ public class ServerManager {
         } catch (IOException e) {
             allPrintWay.accept(e.getMessage());
         }
-        serverClient = new Client(12221,"127.0.0.1", allPrintWay, allInputWay, "/serverClientPlug");
-        new Thread(() -> {
-            serverClient.receive();
-        }).start();
+        ClientFactory.setPlugDir("serverClientPlug");
+        serverClient = ClientFactory.getView();
+        serverClient.start();
     }
     public void addCnt() {
         Socket accept = null;
         try {
             accept = serSoc.accept();
             CoreServer coreServer = new CoreServer(accept, this.serverPlugs, allObjOut);
+            coreServer.start();
             all.add(coreServer);
             coreServer.setOthers(all);
-            coreServer.start();
-            System.out.println(coreServer.getClientName());
             for(var plug : serverPlugs)
             {
                 plug.afterReceive(coreServer);

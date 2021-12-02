@@ -33,4 +33,5 @@ public abstract class AbsServerPlug<T> extends AbsPlug<T>{
     public abstract void beforeWrite(CoreServer whatSocket);//写入之前呢?
     public abstract void afterWriter(CoreServer whatSocket);//在写入之后要做什么
     public abstract void afterReceive(CoreServer whatSocket);//在收到客户端socket之后做些什么呢
+    public abstract void whenClientDisconnection(CoreServer disServer);//客户端失去链接时
 }

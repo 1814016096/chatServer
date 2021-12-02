@@ -17,10 +17,15 @@ public class ConsoleView implements AbsClientView{
     @Override
     public void start() {
         new Thread(client::receive).start();
-        while(!client.isThisIsColse())
-        {
-            client.say(inputWay.get());
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!client.isThisIsColse())
+                {
+                    client.say(inputWay.get());
+                }
+            }
+        }).start();
     }
 
     @Override
