@@ -41,12 +41,18 @@ public class ServerManager {
     {
         this(null,null);
     }
+
     public ServerManager(Consumer<String> allPrintWay, Supplier<String> allInputWay) {
+        this(12221,allPrintWay,allInputWay, "serverClientPlug", "serverplug");
+    }
+
+    public ServerManager(int ip, Consumer<String> allPrintWay, Supplier<String> allInputWay,
+                         String dir, String serverDir) {
         all = new ArrayList<>(20);
         serverPlugsCl = new ArrayList<>(20);
         allObjOut = new HashMap<>();
         String mainTo = "/chatServe";
-        File plugDir = new File(System.getProperty("user.dir") + mainTo + "\\serverplug");
+        File plugDir = new File(System.getProperty("user.dir") + mainTo + "/" + serverDir);
         File[] plugs = plugDir.listFiles();
         for(var plug : plugs)
         {
@@ -91,11 +97,11 @@ public class ServerManager {
             }
         }
         try {
-            serSoc = new ServerSocket(12221);
+            serSoc = new ServerSocket(ip);
         } catch (IOException e) {
             allPrintWay.accept(e.getMessage());
         }
-        ClientFactory.setPlugDir("serverClientPlug");
+        ClientFactory.setPlugDir(dir);
         serverClient = ClientFactory.getView();
         serverClient.start();
     }

@@ -88,7 +88,6 @@ public class ClientFactory {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String mainTo = "/chatServe";
         Client client = new Client(port, ip, currentViwe.getPrintWay(), currentViwe.getInputWay(), plugDir);
         currentViwe.setClient(client);
         return currentViwe;

@@ -351,6 +351,10 @@ public class Client {
         return temp.toString();//ok
     }
     public void say(String str) {
+        if(str == null || str.length() == 0)
+        {
+            return ;
+        }
         String start = getStartWith(str);
         tempStatement = str;
         ArrayList<AbsClientPlug<?, ?>> enablePlugList = matchPlug(split(str).get(0));
@@ -361,7 +365,7 @@ public class Client {
             datepack.setDataType(anylizeType(start));
             datepack.setStartWith(start);
             datepack.setData(str);
-            allPrintWay.accept("(" + datepack.getDataType() + ")" + name + ":" + str);
+//            allPrintWay.accept("(" + datepack.getDataType() + ")" + name + ":" + str);
             try {
                 objout.writeObject(datepack);
             } catch (IOException e) {
