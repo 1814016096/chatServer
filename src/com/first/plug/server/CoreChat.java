@@ -1,7 +1,9 @@
 package com.first.plug.server;
 
 import com.first.Ann.ServerPlug;
+import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
+import com.first.server.CoreServer;
 
 /**
  * @author 原初
@@ -17,8 +19,7 @@ public class CoreChat extends NormalPlug{
     }
 
     @Override
-    public void beforeWrite() {
-        getGettedPack().setData("<" + getGettedPack().getName()
-                + ">" + getGettedPack().getInnerData());
+    public AbsDataPack<String> afterInput(CoreServer coreServer) {
+        return this.getGettedPack();
     }
 }

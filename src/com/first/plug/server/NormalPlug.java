@@ -4,6 +4,9 @@ import com.first.Ann.ServerPlug;
 import com.first.datapack.AbsDataPack;
 import com.first.plug.AbsType;
 import com.first.server.CoreServer;
+import com.first.server.ServerManager;
+
+import java.util.ArrayList;
 
 /**
  * @author 原初
@@ -18,22 +21,38 @@ public class NormalPlug extends AbsServerPlug<String>{
         setFlag("");
     }
     @Override
-    public AbsDataPack<String> afterInput() {
+    public void whenInit(ServerManager manager) {
+
+    }
+
+    @Override
+    public AbsDataPack<String> afterInput(CoreServer coreServer) {
         return null;
     }
 
     @Override
-    public boolean filter(CoreServer otherClient) {
+    public boolean filter(CoreServer otherClient, ArrayList<CoreServer> others) {
         return true;
     }
 
     @Override
-    public void beforeWrite() {
+    public void beforeWrite(CoreServer whatSocket) {
 
     }
 
     @Override
-    public void afterWriter() {
+    public void afterWriter(CoreServer whatSocket) {
 
     }
+
+    @Override
+    public void afterReceive(CoreServer whatSocket) {
+
+    }
+
+    @Override
+    public void whenClientDisconnection(CoreServer disServer) {
+
+    }
+
 }

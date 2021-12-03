@@ -1,10 +1,8 @@
 package com.first.plugloader;
 
-import com.first.datapack.ChatDataPack;
-import com.first.plug.server.AbsServerPlug;
+import com.first.plug.AbsPlug;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
@@ -14,7 +12,7 @@ import java.util.ArrayList;
  */
 public class PlugProTest {
     @Test
-    public void getPlugTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    public void getPlugTest(){
         PlugProcess p = new PlugProcess();
 //        ArrayList<Class<? extends AbsServerPlug<?>>> allPathPlug = p.getAllPathPlug("D:\\IdeaWorkspace\\day6\\out\\artifacts\\chatServe_jar3\\" +
 //                "chatServe.jar");
@@ -27,20 +25,20 @@ public class PlugProTest {
 //                System.out.println(m.invoke(absServerPlug, new CoreServer(new Socket())));//ok
 //            }
 //        }
-        ArrayList<Class<? extends AbsServerPlug<?>>> al = p.getAllPathPlug("D:\\IdeaWorkspace\\" +
-                "day6\\out\\artifacts\\chatServe_jar3\\chatServe.jar");
-        ArrayList<Class<? extends AbsServerPlug<?>>> c = p.judgeLegalPlug(new ChatDataPack(), al);
-        if(c != null)
-        {
-            for(var d : c)
-            {
-                System.out.println(d.getName());
-            }
-        }
-        else
-        {
-            System.out.println("null");
-        }
+        ArrayList<Class<? extends AbsPlug<?>>> al = p.getAllPathPlug("D:\\IdeaWorkspace\\" +
+                "day6\\out\\artifacts\\chatServe_jar3\\chatServe.jar","ServerPlug");
+//        ArrayList<Class<? extends AbsPlug<?>>> c = p.judgeLegalPlug(new ChatDataPack(), al);
+//        if(c != null)
+//        {
+//            for(var d : c)
+//            {
+//                System.out.println(d.getName());
+//            }
+//        }
+//        else
+//        {
+//            System.out.println("null");
+//        }
 
     }
 }

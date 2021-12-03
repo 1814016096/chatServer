@@ -8,6 +8,8 @@ import java.io.Serializable;
  * @version 0.0.2 一个枚举类，定义插件的传输数据类型类型
  */
 public enum AbsType implements Serializable {
+    START,//开始连接
+
     CORE,//抽象类专用，别用
 
     INFO,//信息，只限服务端用,如果你的插件只想发送给某个指定客户端信息请用这个
@@ -18,6 +20,8 @@ public enum AbsType implements Serializable {
 
     PLUG,//自定义插件请用这个
 
-    END;//结束，表示客户端关闭或服务端关闭
+    END,//结束，表示发送结束
+
+    CLOSE;//代表客户端或服务端关闭
     static final long serialVersionUID = 111L;
 }
